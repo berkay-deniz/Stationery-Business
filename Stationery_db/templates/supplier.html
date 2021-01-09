@@ -1,0 +1,21 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    Tedarikçi
+{% endblock title %}
+
+{% block content %}
+{% from "includes/formhelpers.html" import render_field %}
+
+<h3>Yeni Tedarikçi Ekle</h3>
+<hr>
+
+<form method="post">
+
+        {{ render_field(form.name, class="form-control") }}
+        {{ render_field(form.phoneNumber, class="form-control") }}
+        {{ render_field(form.address, class="form-control") }}
+        {{ render_field(form.debt, class="form-control") }}
+        <button type="submit" class="btn btn-primary">Ekle</button>
+</form>
+{% endblock content %}
