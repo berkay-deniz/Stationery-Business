@@ -39,6 +39,16 @@ def readCustomer(conn):
    
     return data
     
+def readSupplier(conn):
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM SUPPLIER')
+    columns = [column[0] for column in cursor.description]
+    data = []
+    for row in cursor.fetchall():
+        data.append(dict(zip(columns, row)))
+   
+    return data
+
 
 class StaffForm(Form):
     tckn = StringField("TC Kimlik No",validators=[validators.length(min=11,max=11,message='Geçersiz TC kimlik no'), validators.DataRequired('Bu alan gerekli!')])
@@ -62,6 +72,7 @@ class ProductForm(Form):
     salePrice = IntegerField("Satış fiyatı")
     stock = IntegerField("Stok")
 
+<<<<<<< HEAD
 class salesReceiptForm(Form):
 
      receiptNumber = StringField("Fatura Numarası")
@@ -72,6 +83,17 @@ class salesReceiptForm(Form):
      date = StringField("Tarih")
 
 def insertSalesReceipt(conn,receiptNumber,customerId,date):
+=======
+class PurchaseReceiptForm(Form):
+    suppliers = []
+    data = readSupplier(conn)
+    for row in data:
+        suppliers.append(row.get("SupplierName")) 
+
+    receiptNumber = StringField("Fatura numarası",validators=[validators.length(min = 8, max = 8, message="Fatura numarası 8 haneli olmalıdır")])
+    supplierName = SelectField("Tedarikçi adı", choices=suppliers)
+    date = StringField("Tarih")
+>>>>>>> 69458788b7a82333b4f0fcf2d148d3519d28b279
 
     cursor = conn.cursor()
     cursor.execute(
@@ -128,6 +150,16 @@ def insertProduct(conn, productTypeId, brand, purchasePrice, salePrice, stock):
     )
     conn.commit()
     print("inserted")
+
+def insertPurchaseReceipt(conn, receiptNumber, supplierId, date):
+    cursor=conn.cursor()
+    cursor.execute(
+        'insert into PURCHASE_RECEIPT (ReceiptNumber, SupplierId, Date) values(?,?,?)',
+        (receiptNumber, supplierId, date)
+    )
+    conn.commit()
+    print("Inserted")
+
 
 app = Flask(__name__)
 
@@ -220,6 +252,27 @@ def staff():
 
     else:
         return render_template("staff.html",form = form)
+
+@app.route("/purchaseReceipt", methods=["GET","POST"])
+def purchaseReceipt():
+    form = PurchaseReceiptForm(request.form)
+
+    if request.method == "POST" and form.validate():
+        receiptNumber = form.receiptNumber.data
+        supplierName = form.supplierName.data
+        date = form.date.data
+        
+        data=readSupplier(conn)
+        for row in data:
+            if row.get("SupplierName") == supplierName:
+                supplierId = row.get("id")
+                break
+
+        insertPurchaseReceipt(conn, receiptNumber, supplierId, date)
+        return redirect("/")   
+    else:
+        return render_template("purchaseReceipt.html", form = form)
+
 
 if __name__ ==  "__main__":
     app.run(debug=True)

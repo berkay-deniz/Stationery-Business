@@ -1,0 +1,20 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    Tedarik Faturası
+{% endblock title %}
+
+{% block content %}
+{% from "includes/formhelpers.html" import render_field %}
+
+<h3>Yeni Tedarik Faturası Ekle</h3>
+<hr>
+
+<form method="post">
+
+        {{ render_field(form.receiptNumber, class="form-control col-4") }}
+        {{ render_field(form.supplierName, class="form-control col-4") }}
+        {{ render_field(form.date, class="form-control col-4") }}
+        <button type="submit" class="btn btn-primary">Ekle</button>
+</form>
+{% endblock content %}
