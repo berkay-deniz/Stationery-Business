@@ -72,7 +72,7 @@ class ProductForm(Form):
     salePrice = IntegerField("Satış fiyatı")
     stock = IntegerField("Stok")
 
-<<<<<<< HEAD
+
 class salesReceiptForm(Form):
 
      receiptNumber = StringField("Fatura Numarası")
@@ -82,8 +82,6 @@ class salesReceiptForm(Form):
      companyName = StringField("Şirket Adı")
      date = StringField("Tarih")
 
-def insertSalesReceipt(conn,receiptNumber,customerId,date):
-=======
 class PurchaseReceiptForm(Form):
     suppliers = []
     data = readSupplier(conn)
@@ -92,9 +90,9 @@ class PurchaseReceiptForm(Form):
 
     receiptNumber = StringField("Fatura numarası",validators=[validators.length(min = 8, max = 8, message="Fatura numarası 8 haneli olmalıdır")])
     supplierName = SelectField("Tedarikçi adı", choices=suppliers)
-    date = StringField("Tarih")
->>>>>>> 69458788b7a82333b4f0fcf2d148d3519d28b279
+    date = StringField("Tarih")     
 
+def insertSalesReceipt(conn,receiptNumber,customerId,date):
     cursor = conn.cursor()
     cursor.execute(
     'insert into SALES_RECEIPT (ReceiptNumber,CustomerId,Date) values (?,?,?)',
