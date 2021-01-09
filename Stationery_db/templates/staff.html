@@ -1,0 +1,28 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    Çalışanlar
+{% endblock title %}
+
+{% block content %}
+{% from "includes/formhelpers.html" import render_field %}
+    <h2>Çalışan Ekle</h2>
+    <br>
+    <hr>
+
+    <form method="post">
+
+        {{ render_field(form.tckn, class="form-control") }}
+        {{ render_field(form.fname, class="form-control") }}
+        {{ render_field(form.lname, class="form-control") }}
+        {{ render_field(form.phoneNumber, class="form-control") }}
+        {{ render_field(form.address, class="form-control") }}
+        {{ render_field(form.bdate, class="form-control") }}
+        {{ render_field(form.wage, class="form-control") }}
+        {{ render_field(form.rest, class="form-control") }}
+        <button type="submit" class="btn btn-primary">Ekle</button>
+</form>
+
+
+
+{% endblock content %}

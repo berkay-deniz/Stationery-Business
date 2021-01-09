@@ -1,6 +1,6 @@
 from flask import Flask,render_template,flash,redirect,url_for,session,logging,request
 import pyodbc
-from wtforms import Form,StringField,TextAreaField,PasswordField,validators,IntegerField
+from wtforms import Form,StringField,TextAreaField,PasswordField,validators,IntegerField,DateField
 
 conn = pyodbc.connect(
     "Driver={SQL Server};"
@@ -11,9 +11,21 @@ conn = pyodbc.connect(
 
 class SupplierForm(Form):
     name = StringField('Tedarikçi İsmi',validators = [validators.length(max=50,message='Çok fazla karakter girdiniz!'), validators.DataRequired('Bu alan gerekli')])
-    phoneNumber = IntegerField('Telefon Numarası')
+    phoneNumber = StringField('Telefon Numarası')
     address = StringField('Adres')
     debt = IntegerField('Borç')
+
+
+class StaffForm(Form):
+    tckn = IntegerField("TC Kimlik No",validators=[ validators.DataRequired('Bu alan gerekli!')])
+    fname = StringField('Ad', validators = [validators.length(max=25,message='Çok fazla karakter girdiniz!'), validators.DataRequired('Bu alan gerekli')])
+    lname = StringField('Soyad', validators = [validators.length(max=25,message='Çok fazla karakter girdiniz!'), validators.DataRequired('Bu alan gerekli')])
+    phoneNumber = IntegerField('Telefon Numarası')
+    address = StringField('Adres')
+    bdate = StringField('Doğum Tarihi')
+    wage = IntegerField('Maaş')
+    rest = IntegerField('İzin günü')
+
 
 def readProductType(conn):
     cursor = conn.cursor()
@@ -50,15 +62,29 @@ def insertSupplier(conn, name, phone, address, debt):
     conn.commit()
     print("Inserted")
 
+
+def insertStaff(conn, tckn, fname, lname, phone, address, bdate, wage, rest):
+    cursor=conn.cursor()
+    cursor.execute(
+        'insert into STAFF (Tckn, FirstName, LastName, PhoneNumber, Address, BirthDate, Wage, DaysOfRest) values (?,?,?,?,?,?,?,?)',
+        (tckn, fname, lname, phone, address, bdate, wage, rest)
+    )
+    conn.commit()
+    print("Inserted")
+
+
+
 app = Flask(__name__)
 
 @app.route("/")
 def index():
     return render_template("index.html")
 
+
 @app.route("/about")
 def about():
     return render_template("about.html")
+
 
 @app.route("/supplier", methods=["GET","POST"])
 def supplier():
@@ -74,13 +100,24 @@ def supplier():
     else:
         return render_template("supplier.html",form = form)
 
-@app.route("/about/afy")
-def afy():
-    return "AFY hakkında"
+@app.route("/staff", methods=["GET","POST"])
+def staff():
+    form = StaffForm(request.form)
 
-@app.route("/about/VG")
-def VG():
-    return "VG hakkında"
+    if request.method == "POST" and form.validate():
+        tckn = form.tckn.data
+        fname = form.fname.data
+        lname = form.lname.data
+        phone = form.phoneNumber.data
+        address = form.address.data
+        bdate = form.bdate.data
+        wage = form.wage.data
+        rest = form.rest.data
+        insertStaff(conn, tckn, fname, lname, phone, address, bdate, wage, rest)
+        return redirect('/')
+
+    else:
+        return render_template("staff.html",form = form)
 
 if __name__ ==  "__main__":
     app.run(debug=True)
