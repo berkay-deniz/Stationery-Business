@@ -1,0 +1,20 @@
+{% extends 'layout.html' %}
+{% block title %}
+    Ürün
+{% endblock title %}
+
+{% block content %}
+{% from "includes/formhelpers.html" import render_field %}
+    <h2>Ürün ekle</h2>
+    <hr>
+    <form method="post">
+
+        {{ render_field(form.typeName, class="form-control col-4") }}
+        {{ render_field(form.brand, class="form-control col-4") }}
+        {{ render_field(form.purchasePrice, class="form-control col-4") }}
+        {{ render_field(form.salePrice, class="form-control col-4") }}
+        {{ render_field(form.stock, class="form-control col-4") }}
+    
+        <button type="submit" class="btn btn-primary">Ekle</button>
+</form>
+{% endblock content %}
