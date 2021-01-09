@@ -1,6 +1,6 @@
 from flask import Flask,render_template,flash,redirect,url_for,session,logging,request
 import pyodbc
-from wtforms import Form,StringField,TextAreaField,PasswordField,validators,IntegerField,DateField
+from wtforms import Form,StringField,TextAreaField,PasswordField,validators,IntegerField,DateField,SelectField
 #VG DESKTOP-CPMCPBA
 conn = pyodbc.connect(
     "Driver={SQL Server};"
@@ -15,6 +15,16 @@ class SupplierForm(Form):
     address = StringField('Adres')
     debt = IntegerField('Borç')
 
+def readProductType(conn):
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM PRODUCT_TYPE')
+    columns = [column[0] for column in cursor.description]
+    data = []
+    for row in cursor.fetchall():
+        data.append(dict(zip(columns, row)))
+   
+    return data
+    
 
 class StaffForm(Form):
     tckn = StringField("TC Kimlik No",validators=[validators.length(min=11,max=11,message='Geçersiz TC kimlik no'), validators.DataRequired('Bu alan gerekli!')])
@@ -26,17 +36,20 @@ class StaffForm(Form):
     wage = IntegerField('Maaş')
     rest = IntegerField('İzin günü')
 
+class ProductForm(Form):
+    types = []
+    data = readProductType(conn)
+    for row in data:
+        types.append(row.get("TypeName")) 
 
-def readProductType(conn):
-    cursor = conn.cursor()
-    cursor.execute('SELECT * FROM PRODUCT_TYPE')
-    columns = [column[0] for column in cursor.description]
-    data = []
-    for row in cursor.fetchall():
-        data.append(dict(zip(columns, row)))
-   
-    return data
-    
+    typeName = SelectField("Ürün çeşidi",choices=types)
+    brand = StringField("Marka")
+    purchasePrice = IntegerField("Alış fiyatı")
+    salePrice = IntegerField("Satış fiyatı")
+    stock = IntegerField("Stok")
+
+
+
 
 def insertProductType(conn, product_type):
     cursor=conn.cursor()
@@ -76,7 +89,14 @@ def insertStaff(conn, tckn, fname, lname, phone, address, bdate, wage, rest):
     conn.commit()
     print("Inserted")
 
-
+def insertProduct(conn, productTypeId, brand, purchasePrice, salePrice, stock):
+    cursor=conn.cursor()
+    cursor.execute(
+        'insert into PRODUCT (ProductTypeId, Brand, PurchasePrice, SalePrice, Stock) values(?,?,?,?,?)',
+        (productTypeId, brand, purchasePrice, salePrice, stock)
+    )
+    conn.commit()
+    print("inserted")
 
 app = Flask(__name__)
 
@@ -89,6 +109,27 @@ def index():
 def about():
     return render_template("about.html")
 
+@app.route("/product", methods=["GET","POST"])
+def product():
+    form = ProductForm(request.form)
+
+    if request.method == "POST" and form.validate():
+        typeName = form.typeName.data
+        brand = form.brand.data
+        purchasePrice = form.purchasePrice.data
+        salePrice = form.salePrice.data
+        stock = form.stock.data 
+        
+        data=readProductType(conn)
+        for row in data:
+            if row.get("TypeName") == typeName:
+                productTypeId = row.get("id")
+                break
+
+        insertProduct(conn, productTypeId, brand, purchasePrice, salePrice, stock)
+        return redirect("/")   
+    else:
+        return render_template("product.html", form = form)      
 
 @app.route("/supplier", methods=["GET","POST"])
 def supplier():

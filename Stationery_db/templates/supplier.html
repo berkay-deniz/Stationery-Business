@@ -12,10 +12,10 @@
 
 <form method="post">
 
-        {{ render_field(form.name, class="form-control") }}
-        {{ render_field(form.phoneNumber, class="form-control") }}
-        {{ render_field(form.address, class="form-control") }}
-        {{ render_field(form.debt, class="form-control") }}
+        {{ render_field(form.name, class="form-control col-4") }}
+        {{ render_field(form.phoneNumber, class="form-control col-4") }}
+        {{ render_field(form.address, class="form-control col-4") }}
+        {{ render_field(form.debt, class="form-control col-4") }}
         <button type="submit" class="btn btn-primary">Ekle</button>
 </form>
 {% endblock content %}
