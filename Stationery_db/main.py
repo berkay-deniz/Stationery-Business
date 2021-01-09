@@ -7,7 +7,7 @@ from wtforms import Form,StringField,TextAreaField,PasswordField,validators,Inte
 #AFY DESKTOP-ISHU912
 conn = pyodbc.connect(
     "Driver={SQL Server};"
-    "Server=DESKTOP-CPMCPBA;" 
+    "Server=DESKTOP-ISHU912;" 
     "Database=STATIONERY_BUSINESS;"
     "Trusted_Connection=yes;"
 )
@@ -22,6 +22,16 @@ class SupplierForm(Form):
 def readProductType(conn):
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM PRODUCT_TYPE')
+    columns = [column[0] for column in cursor.description]
+    data = []
+    for row in cursor.fetchall():
+        data.append(dict(zip(columns, row)))
+   
+    return data
+
+def readCustomer(conn):
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM CUSTOMER')
     columns = [column[0] for column in cursor.description]
     data = []
     for row in cursor.fetchall():
@@ -52,8 +62,25 @@ class ProductForm(Form):
     salePrice = IntegerField("Satış fiyatı")
     stock = IntegerField("Stok")
 
+class salesReceiptForm(Form):
 
+     receiptNumber = StringField("Fatura Numarası")
+     customerType = SelectField("Müşteri Türü",choices=[('Company'),('Person')])
+     firstName = StringField("Ad")
+     lastName = StringField("Soyad")
+     companyName = StringField("Şirket Adı")
+     date = StringField("Tarih")
 
+def insertSalesReceipt(conn,receiptNumber,customerId,date):
+
+    cursor = conn.cursor()
+    cursor.execute(
+    'insert into SALES_RECEIPT (ReceiptNumber,CustomerId,Date) values (?,?,?)',
+        (receiptNumber,customerId,date)
+
+    ) 
+    conn.commit()
+    print("Sale receipt created")
 
 def insertProductType(conn, product_type):
     cursor=conn.cursor()
@@ -133,8 +160,34 @@ def product():
         insertProduct(conn, productTypeId, brand, purchasePrice, salePrice, stock)
         return redirect("/")   
     else:
-        return render_template("product.html", form = form)      
+        return render_template("product.html", form = form)   
 
+@app.route("/salesReceipt",methods=["GET","POST"])
+def salesReceipt():
+    form = salesReceiptForm(request.form)
+
+    if request.method == "POST" and form.validate():
+        receiptNumber=form.receiptNumber.data
+        customerType = form.customerType.data
+        firstName = form.firstName.data
+        lastName = form.lastName.data
+        companyName = form.companyName.data
+        date = form.date.data
+
+        data=readCustomer(conn)
+        for row in data:
+    
+            if row.get("CustomerType")=='Company' and row.get("CompanyName")==companyName:
+                customerId=row.get("id")
+                break
+            elif row.get("CustomerType")=='Person' and row.get("FirstName")==firstName:
+                customerId=row.get("id") 
+                break
+        insertSalesReceipt(conn,receiptNumber,customerId,date)
+        return redirect("/")
+    else :
+        return render_template("sales receipt.html",form = form)           
+                  
 @app.route("/supplier", methods=["GET","POST"])
 def supplier():
     form = SupplierForm(request.form)
