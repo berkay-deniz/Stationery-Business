@@ -11,16 +11,16 @@ conn = pyodbc.connect(
 
 class SupplierForm(Form):
     name = StringField('Tedarikçi İsmi',validators = [validators.length(max=50,message='Çok fazla karakter girdiniz!'), validators.DataRequired('Bu alan gerekli')])
-    phoneNumber = StringField('Telefon Numarası')
+    phoneNumber = StringField('Telefon Numarası', validators=[validators.length(min=10, max=10,message='Geçersiz Telefon Numarası')])
     address = StringField('Adres')
     debt = IntegerField('Borç')
 
 
 class StaffForm(Form):
-    tckn = IntegerField("TC Kimlik No",validators=[ validators.DataRequired('Bu alan gerekli!')])
+    tckn = StringField("TC Kimlik No",validators=[validators.length(min=11,max=11,message='Geçersiz TC kimlik no'), validators.DataRequired('Bu alan gerekli!')])
     fname = StringField('Ad', validators = [validators.length(max=25,message='Çok fazla karakter girdiniz!'), validators.DataRequired('Bu alan gerekli')])
     lname = StringField('Soyad', validators = [validators.length(max=25,message='Çok fazla karakter girdiniz!'), validators.DataRequired('Bu alan gerekli')])
-    phoneNumber = IntegerField('Telefon Numarası')
+    phoneNumber = StringField('Telefon Numarası', validators=[validators.length(min=10, max=10, message='Geçersiz Telefon Numarası')])
     address = StringField('Adres')
     bdate = StringField('Doğum Tarihi')
     wage = IntegerField('Maaş')
@@ -30,8 +30,12 @@ class StaffForm(Form):
 def readProductType(conn):
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM PRODUCT_TYPE')
-    for row in cursor:
-        print(f'{row}')
+    columns = [column[0] for column in cursor.description]
+    data = []
+    for row in cursor.fetchall():
+        data.append(dict(zip(columns, row)))
+   
+    return data
     
 
 def insertProductType(conn, product_type):
