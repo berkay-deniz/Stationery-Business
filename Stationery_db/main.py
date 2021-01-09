@@ -1,13 +1,14 @@
 from flask import Flask,render_template,flash,redirect,url_for,session,logging,request
 import pyodbc
 from wtforms import Form,StringField,TextAreaField,PasswordField,validators,IntegerField,DateField
-
+#LAPTOP-HCAE3FVL\MSSQLSERVER01;
 conn = pyodbc.connect(
     "Driver={SQL Server};"
-    "Server=LAPTOP-HCAE3FVL\MSSQLSERVER01;"
+    "Server=LAPTOP-HCAE3FVL\MSSQLSERVER01;" 
     "Database=STATIONERY_BUSINESS;"
     "Trusted_Connection=yes;"
 )
+
 
 class SupplierForm(Form):
     name = StringField('Tedarikçi İsmi',validators = [validators.length(max=50,message='Çok fazla karakter girdiniz!'), validators.DataRequired('Bu alan gerekli')])
