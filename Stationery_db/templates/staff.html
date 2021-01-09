@@ -6,11 +6,35 @@
 
 {% block content %}
 {% from "includes/formhelpers.html" import render_field %}
-    <h2>Çalışan Ekle</h2>
+    <h2>Çalışanlar</h2>
     <br>
-    <hr>
+    <table class="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col">No</th>
+            <th scope="col">Ad</th>
+            <th scope="col">Soyad</th>
+            <th scope="col">Telefon Numarası</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+              {% for staff in staffData %}
+              <tr>
+                <th scope="row">1</th>
+                <td>{{staff.get('FirstName')}}</td>
+                <td>{{staff.get('LastName')}}</td>
+                <td>{{staff.get('PhoneNumber')}}</td>
+              </tr>
 
-    <form method="post">
+              {% endfor %}
+             
+        </tbody>
+      </table>
+
+<!--<
+
+    form method="post">
 
         {{ render_field(form.tckn, class="form-control") }}
         {{ render_field(form.fname, class="form-control") }}
@@ -21,8 +45,8 @@
         {{ render_field(form.wage, class="form-control") }}
         {{ render_field(form.rest, class="form-control") }}
         <button type="submit" class="btn btn-primary">Ekle</button>
-</form>
+    </form>
 
-
+-->
 
 {% endblock content %}

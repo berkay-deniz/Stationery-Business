@@ -1,6 +1,6 @@
 from flask import Flask,render_template,flash,redirect,url_for,session,logging,request
 import pyodbc
-from wtforms import Form,StringField,TextAreaField,PasswordField,validators,IntegerField,DateField
+from wtforms import Form,StringField,TextAreaField,PasswordField,validators,IntegerField,DateField,SelectField
 #LAPTOP-HCAE3FVL\MSSQLSERVER01;
 #VG DESKTOP-CPMCPBA
 #AFY DESKTOP-ISHU912
@@ -33,6 +33,17 @@ class StaffForm(Form):
 def readProductType(conn):
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM PRODUCT_TYPE')
+    columns = [column[0] for column in cursor.description]
+    data = []
+    for row in cursor.fetchall():
+        data.append(dict(zip(columns, row)))
+   
+    return data
+    
+
+def readStaff(conn):
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM STAFF')
     columns = [column[0] for column in cursor.description]
     data = []
     for row in cursor.fetchall():
@@ -109,6 +120,7 @@ def supplier():
 
 @app.route("/staff", methods=["GET","POST"])
 def staff():
+    staffData = readStaff(conn)
     form = StaffForm(request.form)
 
     if request.method == "POST" and form.validate():
@@ -124,7 +136,7 @@ def staff():
         return redirect('/')
 
     else:
-        return render_template("staff.html",form = form)
+        return render_template("staff.html",form = form, staffData = staffData)
 
 if __name__ ==  "__main__":
     app.run(debug=True)
