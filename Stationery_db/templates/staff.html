@@ -6,8 +6,11 @@
 
 {% block content %}
 {% from "includes/formhelpers.html" import render_field %}
+<div class="head">
     <h2>Çalışanlar</h2>
     <br>
+</div>
+            
     <table class="table table-striped">
         <thead>
           <tr>
@@ -19,23 +22,33 @@
         </thead>
         <tbody>
           
-              {% for staff in staffData %}
-              <tr>
-                <th scope="row">1</th>
-                <td>{{staff.get('FirstName')}}</td>
-                <td>{{staff.get('LastName')}}</td>
-                <td>{{staff.get('PhoneNumber')}}</td>
+              {% for index in range(staffData |length) %}              
+              <tr>       
+                <th scope="row">{{index + 1}}</th>
+                <td>{{staffData[index].get('FirstName')}}</td>
+                <td>{{staffData[index].get('LastName')}}</td>
+                <td>{{staffData[index].get('PhoneNumber')}}</td>
+                <td>
+                <div>
+                  <a href="/staff/info/{{staffData[index].get("id")}}">
+                    <button type="button" class="btn btn-sm" id="editButton" title="Düzenle">
+                      Düzenle
+                    </button>
+                  </a>
+                  <button type="button" data-id="" class="btn btn-sm btn-clean btn-icon btn-icon-md" id="deleteButton" title="Sil">
+                      Sil
+                  </button>
+                </div>
+                </td>
               </tr>
-
               {% endfor %}
              
         </tbody>
       </table>
 
-<!--<
-
-    form method="post">
-
+<!--
+  
+  <form method="post">
         {{ render_field(form.tckn, class="form-control col-4") }}
         {{ render_field(form.fname, class="form-control col-4") }}
         {{ render_field(form.lname, class="form-control col-4") }}

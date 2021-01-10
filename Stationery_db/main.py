@@ -1,12 +1,12 @@
 from flask import Flask, render_template, flash, redirect, url_for, session, logging, request
 import pyodbc
-from wtforms import Form, StringField, TextAreaField, PasswordField, validators, IntegerField, DateField, SelectField
+from wtforms import Form, StringField, TextAreaField, PasswordField, validators, IntegerField, DateField, SelectField, FloatField
 # LAPTOP-HCAE3FVL\MSSQLSERVER01;
 # VG DESKTOP-CPMCPBA
 # AFY DESKTOP-ISHU912
 conn = pyodbc.connect(
     "Driver={SQL Server};"
-    "Server=DESKTOP-ISHU912;"
+    "Server=LAPTOP-HCAE3FVL\MSSQLSERVER01;"
     "Database=STATIONERY_BUSINESS;"
     "Trusted_Connection=yes;"
 )
@@ -47,7 +47,7 @@ class SupplierForm(Form):
     phoneNumber = StringField('Telefon Numarası', validators=[validators.length(
         min=10, max=10, message='Geçersiz Telefon Numarası')])
     address = StringField('Adres')
-    debt = IntegerField('Borç')
+    debt = FloatField('Borç')
 
 class StaffForm(Form):
     tckn = StringField("TC Kimlik No", validators=[validators.length(
@@ -60,7 +60,7 @@ class StaffForm(Form):
         min=10, max=10, message='Geçersiz Telefon Numarası')])
     address = StringField('Adres')
     bdate = StringField('Doğum Tarihi')
-    wage = IntegerField('Maaş')
+    wage = FloatField('Maaş')
     rest = IntegerField('İzin günü')
 
 
@@ -72,8 +72,8 @@ class ProductForm(Form):
 
     typeName = SelectField("Ürün çeşidi", choices=types)
     brand = StringField("Marka")
-    purchasePrice = IntegerField("Alış fiyatı")
-    salePrice = IntegerField("Satış fiyatı")
+    purchasePrice = FloatField("Alış fiyatı")
+    salePrice = FloatField("Satış fiyatı")
     stock = IntegerField("Stok")
 
 class ProductTypeForm(Form):
@@ -138,6 +138,27 @@ def updateProductType(conn, id, type_name):
     cursor = conn.cursor()
     cursor.execute(
         'Update PRODUCT_TYPE set TypeName = ? Where id = ?', (type_name, id)
+    )
+    conn.commit()
+    print('Updated')
+
+
+def updateStaff(conn,id, tckn, fname, lname, phone,
+                    address, bdate, wage, rest):
+    cursor = conn.cursor()
+    cursor.execute(
+        '''Update STAFF set 
+                         Tckn = ?,
+                         FirstName = ?,
+                         LastName = ?,
+                         PhoneNumber = ?,
+                         Address = ?,
+                         Birthdate = ?,
+                         Wage = ?,
+                         DaysOfRest = ?
+                         Where id = ?''', 
+    (tckn, fname, lname, phone,
+                    address, bdate, wage, rest, id)
     )
     conn.commit()
     print('Updated')
@@ -294,6 +315,41 @@ def staff():
 
     else:
         return render_template("staff.html", form=form, staffData=staffData)
+
+@app.route("/staff/info/<string:staffId>", methods=["GET", "POST"])
+def staffInfo(staffId):
+    staffData = readStaff(conn)
+    form = StaffForm(request.form)
+    id =int(staffId)
+
+    if request.method == "POST" and form.validate():
+        tckn = form.tckn.data
+        fname = form.fname.data
+        lname = form.lname.data
+        phone = form.phoneNumber.data
+        address = form.address.data
+        bdate = form.bdate.data
+        wage = form.wage.data
+        rest = form.rest.data
+        updateStaff(conn,id, tckn, fname, lname, phone,
+                    address, bdate, wage, rest)
+        return redirect('/staff')
+    else:
+        for row in staffData:
+            if row.get("id") == id:
+                staff = row
+                break
+        form.tckn.data = staff.get("Tckn")
+        form.fname.data = staff.get("FirstName")
+        form.lname.data = staff.get("LastName")
+        form.phoneNumber.data = staff.get("PhoneNumber")
+        form.address.data = staff.get("Address")
+        form.bdate.data = staff.get("BirthDate")
+        form.wage.data = staff.get("Wage")
+        form.rest.data = staff.get("DaysOfRest")
+        return render_template("staffInfo.html",id=id, staff = staff, form = form)
+
+    
 
 
 @app.route("/purchaseReceipt", methods=["GET", "POST"])
