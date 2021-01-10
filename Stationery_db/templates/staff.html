@@ -9,6 +9,9 @@
 <div class="head">
     <h2>Çalışanlar</h2>
     <br>
+    <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#addStaffModal">
+      Çalışan Ekle
+    </button>
 </div>
             
     <table class="table table-striped">
@@ -29,15 +32,17 @@
                 <td>{{staffData[index].get('LastName')}}</td>
                 <td>{{staffData[index].get('PhoneNumber')}}</td>
                 <td>
-                <div>
+                <div style="float:left">
                   <a href="/staff/info/{{staffData[index].get("id")}}">
-                    <button type="button" class="btn btn-sm" id="editButton" title="Düzenle">
+                    <button type="button" class="btn bt-secondary" id="editButton" title="Düzenle">
                       Düzenle
                     </button>
                   </a>
-                  <button type="button" data-id="" class="btn btn-sm btn-clean btn-icon btn-icon-md" id="deleteButton" title="Sil">
-                      Sil
-                  </button>
+                </div>
+                <div style="float:left"></div>
+                  <form method="post" action="{{ url_for('removeStaff', id=staffData[index].get("id")) }}">
+                    <button type="submit" class="btn btn-secondary" title="Sil">Sil</button>
+                  </form>
                 </div>
                 </td>
               </tr>
@@ -45,20 +50,42 @@
              
         </tbody>
       </table>
+      <br>
+      
+      
+      <!-- Modal -->
+      <div class="modal fade" id="addStaffModal" tabindex="-1" role="dialog" aria-labelledby="addStaffModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Çalışan Ekle</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form method="post">
+                {{ render_field(form.tckn, class="form-control col-6") }}
+                {{ render_field(form.fname, class="form-control col-6") }}
+                {{ render_field(form.lname, class="form-control col-6") }}
+                {{ render_field(form.phoneNumber, class="form-control col-6") }}
+                {{ render_field(form.address, class="form-control col-6") }}
+                {{ render_field(form.bdate, class="form-control col-6") }}
+                {{ render_field(form.wage, class="form-control col-6") }}
+                {{ render_field(form.rest, class="form-control col-6") }}
+                <button type="submit" class="btn btn-primary">Ekle</button>
+            </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
 <!--
   
-  <form method="post">
-        {{ render_field(form.tckn, class="form-control col-4") }}
-        {{ render_field(form.fname, class="form-control col-4") }}
-        {{ render_field(form.lname, class="form-control col-4") }}
-        {{ render_field(form.phoneNumber, class="form-control col-4") }}
-        {{ render_field(form.address, class="form-control col-4") }}
-        {{ render_field(form.bdate, class="form-control col-4") }}
-        {{ render_field(form.wage, class="form-control col-4") }}
-        {{ render_field(form.rest, class="form-control col-4") }}
-        <button type="submit" class="btn btn-primary">Ekle</button>
-    </form>
+  
 
 -->
 

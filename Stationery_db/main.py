@@ -1,46 +1,7 @@
 from flask import Flask, render_template, flash, redirect, url_for, session, logging, request
-import pyodbc
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators, IntegerField, DateField, SelectField, FloatField
-# LAPTOP-HCAE3FVL\MSSQLSERVER01;
-# VG DESKTOP-CPMCPBA
-# AFY DESKTOP-ISHU912
-conn = pyodbc.connect(
-    "Driver={SQL Server};"
-    "Server=LAPTOP-HCAE3FVL\MSSQLSERVER01;"
-    "Database=STATIONERY_BUSINESS;"
-    "Trusted_Connection=yes;"
-)
+from SqlServerConnection import *
 
-def readProductType(conn):
-    cursor = conn.cursor()
-    cursor.execute('SELECT * FROM PRODUCT_TYPE')
-    columns = [column[0] for column in cursor.description]
-    data = []
-    for row in cursor.fetchall():
-        data.append(dict(zip(columns, row)))
-
-    return data
-
-
-def readCustomer(conn):
-    cursor = conn.cursor()
-    cursor.execute('SELECT * FROM CUSTOMER')
-    columns = [column[0] for column in cursor.description]
-    data = []
-    for row in cursor.fetchall():
-        data.append(dict(zip(columns, row)))
-
-    return data
-
-def readSupplier(conn):
-    cursor = conn.cursor()
-    cursor.execute('SELECT * FROM SUPPLIER')
-    columns = [column[0] for column in cursor.description]
-    data = []
-    for row in cursor.fetchall():
-        data.append(dict(zip(columns, row)))
-
-    return data
 class SupplierForm(Form):
     name = StringField('Tedarikçi İsmi', validators=[validators.length(
         max=50, message='Çok fazla karakter girdiniz!'), validators.DataRequired('Bu alan gerekli')])
@@ -101,109 +62,6 @@ class PurchaseReceiptForm(Form):
     supplierName = SelectField("Tedarikçi adı", choices=suppliers)
     date = StringField("Tarih")
 
-
-def insertSalesReceipt(conn, receiptNumber, customerId, date):
-    cursor = conn.cursor()
-    cursor.execute(
-        'insert into SALES_RECEIPT (ReceiptNumber,CustomerId,Date) values (?,?,?)',
-        (receiptNumber, customerId, date)
-
-    )
-    conn.commit()
-    print("Sale receipt created")
-
-
-def readStaff(conn):
-    cursor = conn.cursor()
-    cursor.execute('SELECT * FROM STAFF')
-    columns = [column[0] for column in cursor.description]
-    data = []
-    for row in cursor.fetchall():
-        data.append(dict(zip(columns, row)))
-
-    return data
-
-
-def insertProductType(conn, product_type):
-    cursor = conn.cursor()
-    cursor.execute(
-        'insert into PRODUCT_TYPE (TypeName) values (?)',
-        (product_type)
-    )
-    conn.commit()
-    print("Inserted")
-
-
-def updateProductType(conn, id, type_name):
-    cursor = conn.cursor()
-    cursor.execute(
-        'Update PRODUCT_TYPE set TypeName = ? Where id = ?', (type_name, id)
-    )
-    conn.commit()
-    print('Updated')
-
-
-def updateStaff(conn,id, tckn, fname, lname, phone,
-                    address, bdate, wage, rest):
-    cursor = conn.cursor()
-    cursor.execute(
-        '''Update STAFF set 
-                         Tckn = ?,
-                         FirstName = ?,
-                         LastName = ?,
-                         PhoneNumber = ?,
-                         Address = ?,
-                         Birthdate = ?,
-                         Wage = ?,
-                         DaysOfRest = ?
-                         Where id = ?''', 
-    (tckn, fname, lname, phone,
-                    address, bdate, wage, rest, id)
-    )
-    conn.commit()
-    print('Updated')
-
-
-def insertSupplier(conn, name, phone, address, debt):
-    cursor = conn.cursor()
-    cursor.execute(
-        'insert into SUPPLIER (SupplierName, PhoneNumber, Address, Debt) values (?,?,?,?)',
-        (name, phone, address, debt)
-    )
-    conn.commit()
-    print("Inserted")
-
-
-def insertStaff(conn, tckn, fname, lname, phone, address, bdate, wage, rest):
-    cursor = conn.cursor()
-    cursor.execute(
-        'insert into STAFF (Tckn, FirstName, LastName, PhoneNumber, Address, BirthDate, Wage, DaysOfRest) values (?,?,?,?,?,?,?,?)',
-        (tckn, fname, lname, phone, address, bdate, wage, rest)
-    )
-    conn.commit()
-    print("Inserted")
-
-
-def insertProduct(conn, productTypeId, brand, purchasePrice, salePrice, stock):
-    cursor = conn.cursor()
-    cursor.execute(
-        'insert into PRODUCT (ProductTypeId, Brand, PurchasePrice, SalePrice, Stock) values(?,?,?,?,?)',
-        (productTypeId, brand, purchasePrice, salePrice, stock)
-    )
-    conn.commit()
-    print("inserted")
-
-
-def insertPurchaseReceipt(conn, receiptNumber, supplierId, date):
-    cursor = conn.cursor()
-    cursor.execute(
-        'insert into PURCHASE_RECEIPT (ReceiptNumber, SupplierId, Date) values(?,?,?)',
-        (receiptNumber, supplierId, date)
-    )
-    conn.commit()
-    print("Inserted")
-
-
 app = Flask(__name__)
 
 
@@ -216,6 +74,8 @@ def index():
 def about():
     return render_template("about.html")
 
+
+
 @app.route("/productType", methods=["GET", "POST"])
 def productType():
     form = ProductTypeForm(request.form)
@@ -227,6 +87,7 @@ def productType():
         return redirect("/")
     else:
         return render_template("product type.html", form=form)
+
 
 
 @app.route("/product", methods=["GET", "POST"])
@@ -251,6 +112,7 @@ def product():
         return redirect("/")
     else:
         return render_template("product.html", form=form)
+
 
 
 @app.route("/salesReceipt", methods=["GET", "POST"])
@@ -280,6 +142,8 @@ def salesReceipt():
         return render_template("sales receipt.html", form=form)
 
 
+
+
 @app.route("/supplier", methods=["GET", "POST"])
 def supplier():
     form = SupplierForm(request.form)
@@ -293,6 +157,8 @@ def supplier():
         return redirect("/")
     else:
         return render_template("supplier.html", form=form)
+
+
 
 
 @app.route("/staff", methods=["GET", "POST"])
@@ -311,7 +177,7 @@ def staff():
         rest = form.rest.data
         insertStaff(conn, tckn, fname, lname, phone,
                     address, bdate, wage, rest)
-        return redirect('/')
+        return redirect('/staff')
 
     else:
         return render_template("staff.html", form=form, staffData=staffData)
@@ -373,13 +239,14 @@ def purchaseReceipt():
         return render_template("purchaseReceipt.html", form=form)
 
 
+@app.route('/deleteStaff/<int:id>', methods=['POST'])
+def removeStaff(id):
+    deleteStaff(conn,id)
+    return redirect("/staff")
+
+
 if __name__ == "__main__":
     app.run(debug=True)
-
-
-# readProductType(conn)
-#insertProductType(conn, "test 2")
-#updateProductType(conn, 33, 'New Test')
 
 
 conn.close()
