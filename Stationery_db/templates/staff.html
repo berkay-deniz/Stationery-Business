@@ -27,7 +27,7 @@
           
               {% for index in range(staffData |length) %}              
               <tr>       
-                <th scope="row">{{index + 1}}</th>
+                <th scope="row">{{index+1}}</th>
                 <td>{{staffData[index].get('FirstName')}}</td>
                 <td>{{staffData[index].get('LastName')}}</td>
                 <td>{{staffData[index].get('PhoneNumber')}}</td>

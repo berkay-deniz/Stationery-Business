@@ -5,10 +5,11 @@ import pyodbc
 # AFY DESKTOP-ISHU912
 conn = pyodbc.connect(
     "Driver={SQL Server};"
-    "Server=LAPTOP-HCAE3FVL\MSSQLSERVER01;"
+    "Server=DESKTOP-ISHU912;"
     "Database=STATIONERY_BUSINESS;"
     "Trusted_Connection=yes;"
 )
+
 
 def readProductType(conn):
     cursor = conn.cursor()
@@ -57,13 +58,22 @@ def readStaff(conn):
 def insertSalesReceipt(conn, receiptNumber, customerId, date):
     cursor = conn.cursor()
     cursor.execute(
-        'insert into SALES_RECEIPT (ReceiptNumber,CustomerId,Date) values (?,?,?)',
+        'exec dbo.createSaleReceipt ?,?,?',
         (receiptNumber, customerId, date)
 
     )
     conn.commit()
     print("Sale receipt created")
 
+
+def insertPurchaseReceipt(conn, receiptNumber, supplierId, date):
+    cursor = conn.cursor()
+    cursor.execute(
+        'exec dbo.createPurchaseReceipt ?,?,?',
+        (receiptNumber, supplierId, date)
+    )
+    conn.commit()
+    print("Inserted")
 
 
 def insertProductType(conn, product_type):
@@ -79,12 +89,11 @@ def insertProductType(conn, product_type):
 def insertSupplier(conn, name, phone, address, debt):
     cursor = conn.cursor()
     cursor.execute(
-        'insert into SUPPLIER (SupplierName, PhoneNumber, Address, Debt) values (?,?,?,?)',
+        'exec dbo.addSupplier ?,?,?,?',
         (name, phone, address, debt)
     )
     conn.commit()
     print("Inserted")
-
 
 
 def insertStaff(conn, tckn, fname, lname, phone, address, bdate, wage, rest):
@@ -97,7 +106,6 @@ def insertStaff(conn, tckn, fname, lname, phone, address, bdate, wage, rest):
     print("Inserted")
 
 
-
 def insertProduct(conn, productTypeId, brand, purchasePrice, salePrice, stock):
     cursor = conn.cursor()
     cursor.execute(
@@ -106,18 +114,6 @@ def insertProduct(conn, productTypeId, brand, purchasePrice, salePrice, stock):
     )
     conn.commit()
     print("inserted")
-
-
-
-def insertPurchaseReceipt(conn, receiptNumber, supplierId, date):
-    cursor = conn.cursor()
-    cursor.execute(
-        'insert into PURCHASE_RECEIPT (ReceiptNumber, SupplierId, Date) values(?,?,?)',
-        (receiptNumber, supplierId, date)
-    )
-    conn.commit()
-    print("Inserted")
-
 
 
 def updateProductType(conn, id, type_name):
@@ -129,9 +125,8 @@ def updateProductType(conn, id, type_name):
     print('Updated')
 
 
-
-def updateStaff(conn,id, tckn, fname, lname, phone,
-                    address, bdate, wage, rest):
+def updateStaff(conn, id, tckn, fname, lname, phone,
+                address, bdate, wage, rest):
     cursor = conn.cursor()
     cursor.execute(
         '''Update STAFF set 
@@ -143,9 +138,9 @@ def updateStaff(conn,id, tckn, fname, lname, phone,
                          Birthdate = ?,
                          Wage = ?,
                          DaysOfRest = ?
-                         Where id = ?''', 
-    (tckn, fname, lname, phone,
-                    address, bdate, wage, rest, id)
+                         Where id = ?''',
+        (tckn, fname, lname, phone,
+         address, bdate, wage, rest, id)
     )
     conn.commit()
     print('Updated')
@@ -158,3 +153,37 @@ def deleteStaff(conn, id):
     )
     conn.commit()
     print("Deleted")
+
+
+def deleteSupplier(conn, id):
+    cursor = conn.cursor()
+    cursor.execute(
+
+        'exec dbo.deleteSupplier ?', (id)
+    )
+    conn.commit()
+    print("Deleted")
+
+
+def deleteCustomer(conn, id):
+    cursor = conn.cursor()
+    cursor.execute(
+
+        'exec dbo.deleteCustomer ?', (id)
+    )
+    conn.commit()
+    print("Deleted")
+
+
+def updateSupplier(conn, id, supplierName, phoneNumber, address, debt):
+
+    cursor = conn.cursor()
+    cursor.execute(
+
+        'Update SUPPLIER Set supplierName = ? , phoneNumber=?,address=?,debt= ? where id = ? ', (
+            supplierName, phoneNumber, address, debt, id)
+
+    )
+
+    conn.commit()
+    print("Updated")

@@ -57,8 +57,8 @@ class PurchaseReceiptForm(Form):
     for row in data:
         suppliers.append(row.get("SupplierName"))
 
-    receiptNumber = StringField("Fatura numarası", validators=[validators.length(
-        min=8, max=8, message="Fatura numarası 8 haneli olmalıdır")])
+    receiptNumber = StringField("Fatura Numarası", validators=[validators.length(
+        min=8, max=8, message="Fatura Numarası 8 haneli olmalıdır")])
     supplierName = SelectField("Tedarikçi adı", choices=suppliers)
     date = StringField("Tarih")
 
@@ -146,6 +146,7 @@ def salesReceipt():
 
 @app.route("/supplier", methods=["GET", "POST"])
 def supplier():
+    supplierData=readSupplier(conn)
     form = SupplierForm(request.form)
 
     if request.method == "POST" and form.validate():
@@ -154,9 +155,9 @@ def supplier():
         address = form.address.data
         debt = form.debt.data
         insertSupplier(conn, name, phoneNumber, address, debt)
-        return redirect("/")
+        return redirect("/supplier")
     else:
-        return render_template("supplier.html", form=form)
+        return render_template("supplier.html", form=form,supplierData=supplierData)
 
 
 
@@ -215,7 +216,29 @@ def staffInfo(staffId):
         form.rest.data = staff.get("DaysOfRest")
         return render_template("staffInfo.html",id=id, staff = staff, form = form)
 
-    
+@app.route("/supplier/info/<string:supplierId>", methods=["GET", "POST"])
+def supplierInfo(supplierId):
+    supplierData = readSupplier(conn)
+    form = SupplierForm(request.form)
+    id =int(supplierId)
+
+    if request.method == "POST" and form.validate():
+        name = form.name.data
+        phone = form.phoneNumber.data
+        address = form.address.data
+        debt = form.debt.data
+        updateSupplier(conn,id,name,phone,address,debt)
+        return redirect('/supplier')
+    else:
+        for row in supplierData:
+            if row.get("id") == id:
+               supplier = row
+               break
+        form.name.data = supplier.get("SupplierName")
+        form.phoneNumber.data = supplier.get("PhoneNumber")
+        form.address.data = supplier.get("Address")
+        form.debt.data = supplier.get("Debt")
+        return render_template("supplierInfo.html",id=id, supplier = supplier, form = form)   
 
 
 @app.route("/purchaseReceipt", methods=["GET", "POST"])
@@ -243,6 +266,12 @@ def purchaseReceipt():
 def removeStaff(id):
     deleteStaff(conn,id)
     return redirect("/staff")
+
+@app.route('/deleteSupplier/<int:id>', methods=['POST'])
+def removeSupplier(id):
+    deleteSupplier(conn,id)
+    return redirect("/supplier")
+
 
 
 if __name__ == "__main__":

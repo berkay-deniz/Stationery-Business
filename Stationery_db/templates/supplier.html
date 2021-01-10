@@ -1,21 +1,88 @@
 {% extends 'layout.html' %}
 
 {% block title %}
-    Tedarikçi
+    Tedarikçiler
 {% endblock title %}
 
 {% block content %}
 {% from "includes/formhelpers.html" import render_field %}
+<div class="head">
+    <h2>Tedarikçiler</h2>
+    <br>
+    <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#addSupplierModal">
+      Tedarikçi Ekle
+    </button>
+</div>
+            
+    <table class="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col">No</th>
+            <th scope="col">Tedarikçi İsmi</th>
+            <th scope="col">Telefon Numarası</th>
+            <th scope="col">Adres</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+              {% for index in range(supplierData |length) %}              
+              <tr>       
+                <th scope="row">{{index + 1}}</th>
+                <td>{{supplierData[index].get('SupplierName')}}</td>
+                <td>{{supplierData[index].get('PhoneNumber')}}</td>
+                <td>{{supplierData[index].get('Address')}}</td>
+                <td>
+                <div style="float:left">
+                  <a href="/supplier/info/{{supplierData[index].get("id")}}">
+                    <button type="button" class="btn bt-secondary" id="editButton" title="Düzenle">
+                      Düzenle
+                    </button>
+                  </a>
+                </div>
+                <div style="float:left"></div>
+                  <form method="post" action="{{ url_for('removeSupplier', id=supplierData[index].get("id")) }}">
+                    <button type="submit" class="btn btn-secondary" title="Sil">Sil</button>
+                  </form>
+                </div>
+                </td>
+              </tr>
+              {% endfor %}
+             
+        </tbody>
+      </table>
+      <br>
+      
+      
+      <!-- Modal -->
+      <div class="modal fade" id="addSupplierModal" tabindex="-1" role="dialog" aria-labelledby="addSupplierModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Tedarikçi Ekle</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form method="post">
+                {{ render_field(form.name, class="form-control col-6") }}
+                {{ render_field(form.phoneNumber, class="form-control col-6") }}
+                {{ render_field(form.address, class="form-control col-6") }}
+                {{ render_field(form.debt, class="form-control col-6") }}
+                <button type="submit" class="btn btn-primary">Ekle</button>
+            </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
-<h3>Yeni Tedarikçi Ekle</h3>
-<hr>
+<!--
+  
+  
 
-<form method="post">
+-->
 
-        {{ render_field(form.name, class="form-control col-4") }}
-        {{ render_field(form.phoneNumber, class="form-control col-4") }}
-        {{ render_field(form.address, class="form-control col-4") }}
-        {{ render_field(form.debt, class="form-control col-4") }}
-        <button type="submit" class="btn btn-primary">Ekle</button>
-</form>
 {% endblock content %}
