@@ -93,6 +93,7 @@ def productType():
 @app.route("/product", methods=["GET", "POST"])
 def product():
     productData=readProduct(conn)
+    productTypeData = readProductType(conn)
     form = ProductForm(request.form)
 
     if request.method == "POST" and form.validate():
@@ -102,8 +103,7 @@ def product():
         salePrice = form.salePrice.data
         stock = form.stock.data
 
-        data = readProductType(conn)
-        for row in data:
+        for row in productTypeData:
             if row.get("TypeName") == typeName:
                 productTypeId = row.get("id")
                 break
@@ -112,7 +112,12 @@ def product():
                       purchasePrice, salePrice, stock)
         return redirect("/product")
     else:
-        return render_template("product.html", form=form,productData=productData)
+        productTypes = dict()
+        for typeRow in productTypeData:
+            productTypes[typeRow.get('id')] = typeRow.get('TypeName')
+                
+
+        return render_template("product.html", form=form,productData=productData, productTypes = productTypes)
 
 
 
