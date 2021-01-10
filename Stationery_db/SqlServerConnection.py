@@ -5,7 +5,7 @@ import pyodbc
 # AFY DESKTOP-ISHU912
 conn = pyodbc.connect(
     "Driver={SQL Server};"
-    "Server=DESKTOP-ISHU912;"
+    "Server=DESKTOP-CPMCPBA;"
     "Database=STATIONERY_BUSINESS;"
     "Trusted_Connection=yes;"
 )
@@ -126,6 +126,28 @@ def insertProduct(conn, productTypeId, brand, purchasePrice, salePrice, stock):
     print("inserted")
 
 
+
+def insertPurchaseReceiptProduct(conn, ReceiptId, ProductId, PurchaseUnitPrice, PurchaseAmount, TotalPrice):
+    cursor = conn.cursor()
+    cursor.execute(
+        'insert into PURCHASE_RECEIPT (ReceiptId, ProductId, PurchaseUnitPrice, PurchaseAmount, TotalPrice) values(?, ?, ?, ?, ?)',
+        (ReceiptId, ProductId, PurchaseUnitPrice, PurchaseAmount, TotalPrice)
+    )
+    conn.commit()
+    print("inserted")
+
+
+
+def insertSalesReceiptProduct(conn, ReceiptId, ProductId, SaleUnitPrice, SaleAmount, TotalPrice):
+    cursor = conn.cursor()
+    cursor.execute(
+        'insert into PURCHASE_RECEIPT (ReceiptId, ProductId, SaleUnitPrice, SaleAmount, TotalPrice) values(?, ?, ?, ?, ?)',
+        (ReceiptId, ProductId, SaleUnitPrice, SaleAmount, TotalPrice)
+    )
+    conn.commit()
+    print("inserted")
+
+
 def updateProductType(conn, id, type_name):
     cursor = conn.cursor()
     cursor.execute(
@@ -182,6 +204,58 @@ def updateProduct(conn, id,ProductTypeId,Brand,PurchasePrice,SalePrice,Stock):
     conn.commit()
     print("Updated")    
 
+def updatePurchaseReceipt(conn, id, ReceiptNumber, SupplierId, Date):
+
+    cursor = conn.cursor()
+    cursor.execute(
+
+        'Update PURCHASE_RECEIPT Set ReceiptNumber = ?, SupplierId = ?, Date = ? where id = ? ', (
+            ReceiptNumber, SupplierId, Date, id)
+
+    )
+
+    conn.commit()
+    print("Updated")    
+
+def updatePurchaseReceiptProduct(conn, ReceiptId, ProductId, PurchaseUnitPrice, PurchaseAmount, TotalPrice):
+
+    cursor = conn.cursor()
+    cursor.execute(
+
+        'Update PURCHASE_RECEIPT_PRODUCT Set PurchaseUnitPrice = ?, PurchaseAmount = ?, TotalPrice = ? where ReceiptId = ? and ProductId = ?', (
+            PurchaseUnitPrice, PurchaseAmount, TotalPrice, ReceiptId, ProductId)
+
+    )
+
+    conn.commit()
+    print("Updated")    
+
+def updateSalesReceipt(conn, id, ReceiptNumber, CustomerId, Date):
+
+    cursor = conn.cursor()
+    cursor.execute(
+
+        'Update SALES_RECEIPT Set ReceiptNumber = ?, CustomerId = ?, Date = ? where id = ? ', (
+            ReceiptNumber, CustomerId, Date, id)
+
+    )
+
+    conn.commit()
+    print("Updated")
+
+def updateSalesReceiptProduct(conn, ReceiptId, ProductId, SaleUnitPrice, SaleAmount, TotalPrice):
+
+    cursor = conn.cursor()
+    cursor.execute(
+
+        'Update SALES_RECEIPT_PRODUCT Set SaleUnitPrice = ?, SaleAmount = ?, TotalPrice = ? where ReceiptId = ? and ProductId = ?', (
+            SaleUnitPrice, SaleAmount, TotalPrice, ReceiptId, ProductId)
+
+    )
+
+    conn.commit()
+    print("Updated")    
+
 
 def deleteStaff(conn, id):
     cursor = conn.cursor()
@@ -221,4 +295,34 @@ def deleteProduct(conn,id):
     conn.commit()
     print("Deleted")
 
+def deleteProductType(conn, TypeName):
+    cursor = conn.cursor()
+    cursor.execute(
 
+        'Delete From PRODUCT_TYPE where TypeName = ? ', (TypeName) 
+
+)
+
+def deletePurchaseReceipt(conn, id):
+    cursor = conn.cursor()
+    cursor.execute(
+        'Delete From PURCHASE_RECEIPT where id = ? ', (id) 
+)
+
+def deletePurchaseReceiptProduct(conn,ReceiptId,ProductId):
+    cursor = conn.cursor()
+    cursor.execute(
+        'Delete From PURCHASE_RECEIPT_PRODUCT where ReceiptId = ? and ProductId = ? ', (ReceiptId,ProductId) 
+)
+
+def deleteSalesReceipt(conn, id):
+    cursor = conn.cursor()
+    cursor.execute(
+        'Delete From SALES_RECEIPT where id = ? ', (id) 
+)
+
+def deleteSalesReceiptProduct(conn,ReceiptId,ProductId):
+    cursor = conn.cursor()
+    cursor.execute(
+        'Delete From SALES_RECEIPT_PRODUCT where ReceiptId = ? and ProductId = ? ', (ReceiptId,ProductId) 
+)
