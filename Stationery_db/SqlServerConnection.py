@@ -32,6 +32,15 @@ def readCustomer(conn):
 
     return data
 
+def readProduct(conn):
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM PRODUCT')
+    columns = [column[0] for column in cursor.description]
+    data = []
+    for row in cursor.fetchall():
+        data.append(dict(zip(columns, row)))
+
+    return data
 
 def readSupplier(conn):
     cursor = conn.cursor()
@@ -53,6 +62,7 @@ def readStaff(conn):
         data.append(dict(zip(columns, row)))
 
     return data
+
 
 
 def insertSalesReceipt(conn, receiptNumber, customerId, date):
@@ -145,6 +155,33 @@ def updateStaff(conn, id, tckn, fname, lname, phone,
     conn.commit()
     print('Updated')
 
+def updateSupplier(conn, id, supplierName, phoneNumber, address, debt):
+
+    cursor = conn.cursor()
+    cursor.execute(
+
+        'Update SUPPLIER Set supplierName = ? , phoneNumber=?,address=?,debt= ? where id = ? ', (
+            supplierName, phoneNumber, address, debt, id)
+
+    )
+
+    conn.commit()
+    print("Updated")
+
+
+def updateProduct(conn, id,ProductTypeId,Brand,PurchasePrice,SalePrice,Stock):
+
+    cursor = conn.cursor()
+    cursor.execute(
+
+        'Update PRODUCT Set ProductTypeId = ? , Brand=?,PurchasePrice=?,SalePrice= ?,Stock= ?  where id = ? ', (
+            ProductTypeId, Brand, PurchasePrice, SalePrice,Stock, id)
+
+    )
+
+    conn.commit()
+    print("Updated")    
+
 
 def deleteStaff(conn, id):
     cursor = conn.cursor()
@@ -174,16 +211,14 @@ def deleteCustomer(conn, id):
     conn.commit()
     print("Deleted")
 
-
-def updateSupplier(conn, id, supplierName, phoneNumber, address, debt):
-
+def deleteProduct(conn,id):
     cursor = conn.cursor()
     cursor.execute(
 
-        'Update SUPPLIER Set supplierName = ? , phoneNumber=?,address=?,debt= ? where id = ? ', (
-            supplierName, phoneNumber, address, debt, id)
-
+        'Delete From PRODUCT Where id = ? ', (id)
     )
 
     conn.commit()
-    print("Updated")
+    print("Deleted")
+
+

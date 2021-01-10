@@ -92,6 +92,7 @@ def productType():
 
 @app.route("/product", methods=["GET", "POST"])
 def product():
+    productData=readProduct(conn)
     form = ProductForm(request.form)
 
     if request.method == "POST" and form.validate():
@@ -109,9 +110,9 @@ def product():
 
         insertProduct(conn, productTypeId, brand,
                       purchasePrice, salePrice, stock)
-        return redirect("/")
+        return redirect("/product")
     else:
-        return render_template("product.html", form=form)
+        return render_template("product.html", form=form,productData=productData)
 
 
 
@@ -238,7 +239,37 @@ def supplierInfo(supplierId):
         form.phoneNumber.data = supplier.get("PhoneNumber")
         form.address.data = supplier.get("Address")
         form.debt.data = supplier.get("Debt")
-        return render_template("supplierInfo.html",id=id, supplier = supplier, form = form)   
+        return render_template("supplierInfo.html",id=id, supplier = supplier, form = form)
+
+#product
+@app.route("/product/info/<string:productId>", methods=["GET", "POST"])
+def productInfo(productId):
+    productData = readProduct(conn)
+    form = ProductForm(request.form)
+    id =int(productId)
+    if request.method == "POST" and form.validate():
+        typeName = form.typeName.data
+        brand = form.brand.data
+        purchasePrice = form.purchasePrice.data
+        salePrice = form.salePrice.data
+        stock = form.stock.data
+        typeId = readProductType(conn)
+        for row in typeId:
+            if row.get("TypeName") == typeName:
+                productTypeId = row.get("id")
+                break
+        updateProduct(conn,id,productTypeId,brand,purchasePrice,salePrice,stock,)
+        return redirect('/product')
+    else:
+        for row in productData:
+            if row.get("id") == id:
+               product = row
+               break
+        form.brand.data = product.get("Brand")
+        form.purchasePrice.data = product.get("PurchasePrice")
+        form.salePrice.data = product.get("SalePrice")
+        form.stock.data = product.get("Stock")
+        return render_template("productInfo.html",id=id, product = product, form = form)   
 
 
 @app.route("/purchaseReceipt", methods=["GET", "POST"])
@@ -271,6 +302,11 @@ def removeStaff(id):
 def removeSupplier(id):
     deleteSupplier(conn,id)
     return redirect("/supplier")
+
+@app.route('/deleteProduct/<int:id>', methods=['POST'])
+def removeProduct(id):
+    deleteProduct(conn,id)
+    return redirect("/product")
 
 
 
