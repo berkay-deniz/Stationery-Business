@@ -27,10 +27,10 @@
         </thead>
         <tbody>
           
-              {% for index in range(productData |length) %}              
+              {% for index in range(productData |length) %}             
               <tr>       
                 <th scope="row">{{index + 1}}</th>
-                <td>{{productData[index].get('ProductTypeId')}}</td>
+                <td>{{productTypes[productData[index].get('ProductTypeId')]}}</td>
                 <td>{{productData[index].get('Brand')}}</td>
                 <td>{{productData[index].get('PurchasePrice')}}</td>
                 <td>{{productData[index].get('SalePrice')}}</td>
