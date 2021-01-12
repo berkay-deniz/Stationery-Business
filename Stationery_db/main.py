@@ -62,6 +62,33 @@ class PurchaseReceiptForm(Form):
     supplierName = SelectField("Tedarikçi adı", choices=suppliers)
     date = StringField("Tarih")
 
+class PersonForm(Form):
+    staff = readStaff(conn)
+    staffNames = []
+    for s in staff:
+        name = s.get("FirstName") + " " + s.get("LastName")
+        staffNames.append(name)
+    firstName = StringField("Müşteri Adı")
+    lastName = StringField("Müşteri Soyadı")
+    phone = StringField("Telefon Numarası")
+    address = StringField("Adres")
+    receivable =StringField("Alacak")
+    resStaff = SelectField("İlgilenen Çalışan", choices=staffNames)
+
+
+class CompanyForm(Form):
+    staff = readStaff(conn)
+    staffNames = []
+    for s in staff:
+        name = s.get("FirstName") + " " + s.get("LastName")
+        staffNames.append(name)
+    companyName = StringField("Şirket Adı")
+    taxNumber = StringField("Vergi Numarası")
+    phone = StringField("Telefon Numarası")
+    address = StringField("Adres")
+    receivable =StringField("Alacak")
+    resStaff = SelectField("İlgilenen Çalışan", choices=staffNames)
+
 app = Flask(__name__)
 
 
@@ -118,6 +145,81 @@ def product():
                 
 
         return render_template("product.html", form=form,productData=productData, productTypes = productTypes)
+
+
+@app.route("/person", methods=["GET", "POST"])
+def person():
+    customerData = readCustomer(conn)
+    staffData = readStaff(conn)
+    form = PersonForm(request.form)
+
+    if request.method == "POST" and form.validate():
+        firstName = form.firstName.data
+        lastName = form.lastName.data
+        phone = form.phone.data
+        receivable = form.receivable.data
+        address = form.address.data
+
+        for row in staffData:
+            if row.get("FirstName") + " " + row.get("LastName") == form.resStaff.data:
+                resStaffId = row.get("id")
+                break
+
+
+        insertPersonCustomer(conn, firstName, lastName, phone, address, receivable, resStaffId )
+
+        return redirect("/person")
+
+    else:
+        personCustomers = []
+        for customer in customerData:
+            if customer.get("CustomerType") == "Person":
+                personCustomers.append(customer)
+
+        staffNames = dict()
+        for staff in staffData:
+            staffNames[staff.get("id")] = staff.get("FirstName") + " " + staff.get("LastName")
+
+
+        return render_template("person.html", form=form, personData = personCustomers, staffNames = staffNames)
+
+
+
+@app.route("/company", methods=["GET", "POST"])
+def company():
+    customerData = readCustomer(conn)
+    staffData = readStaff(conn)
+    form = CompanyForm(request.form)
+
+    if request.method == "POST" and form.validate():
+        companyName = form.companyName.data
+        taxNumber = form.taxNumber.data
+        phone = form.phone.data
+        receivable = form.receivable.data
+        address = form.address.data
+
+        for row in staffData:
+            if row.get("FirstName") + " " + row.get("LastName") == form.resStaff.data:
+                resStaffId = row.get("id")
+                break
+
+
+        insertCompanyCustomer(conn, companyName, taxNumber, phone, address, receivable, resStaffId )
+
+        return redirect("/company")
+
+    else:
+        companyCustomers = []
+        for customer in customerData:
+            if customer.get("CustomerType") == "Company":
+                companyCustomers.append(customer)
+
+        staffNames = dict()
+        for staff in staffData:
+            staffNames[staff.get("id")] = staff.get("FirstName") + " " + staff.get("LastName")
+
+
+        return render_template("company.html", form=form, companyData = companyCustomers, staffNames = staffNames)
 
 
 
@@ -230,6 +332,88 @@ def staffInfo(staffId):
         form.rest.data = staff.get("DaysOfRest")
         return render_template("staffInfo.html",id=id, staff = staff, form = form)
 
+
+
+@app.route("/person/info/<int:id>", methods=["GET", "POST"])
+def personInfo(id):
+    customerData = readCustomer(conn)
+    staffData = readStaff(conn)
+    form = PersonForm(request.form)
+
+    if request.method == "POST" and form.validate():
+        firstName = form.firstName.data
+        lastName = form.lastName.data
+        phone = form.phone.data
+        receivable = form.receivable.data
+        address = form.address.data
+
+        for row in staffData:
+            if row.get("FirstName") + " " + row.get("LastName") == form.resStaff.data:
+                resStaffId = row.get("id")
+                break
+
+        updatePersonCustomer(conn, id, firstName, lastName, phone, address, receivable, resStaffId)
+        return redirect('/person')
+
+    else:
+        for row in customerData:
+            if row.get("id") == id:
+                customer = row
+                break
+        form.firstName.data = customer.get("FirstName")
+        form.lastName.data = customer.get("LastName")
+        form.phone.data = customer.get("PhoneNumber")
+        form.address.data = customer.get("Address")
+        form.receivable.data = customer.get("Receivable")
+
+        for row in staffData:
+            if row.get("id") == customer.get("ResponsibleStaffId"):
+                staff = row
+                break
+        form.resStaff.data = staff.get("FirstName") + " " + staff.get("LastName")
+
+        return render_template("personInfo.html",customer = customer, form = form)
+
+
+@app.route("/company/info/<int:id>", methods=["GET", "POST"])
+def companyInfo(id):
+    customerData = readCustomer(conn)
+    staffData = readStaff(conn)
+    form = CompanyForm(request.form)
+
+    if request.method == "POST" and form.validate():
+        companyName = form.companyName.data
+        taxNumber = form.taxNumber.data
+        phone = form.phone.data
+        receivable = form.receivable.data
+        address = form.address.data
+
+        for row in staffData:
+            if row.get("FirstName") + " " + row.get("LastName") == form.resStaff.data:
+                resStaffId = row.get("id")
+                break
+
+        UpdateCompanyCustomer(conn, id, companyName, taxNumber, phone, address, receivable, resStaffId)
+        return redirect('/company')
+
+    else:
+        for row in customerData:
+            if row.get("id") == id:
+                customer = row
+                break
+        form.companyName.data = customer.get("CompanyName")
+        form.taxNumber.data = customer.get("TaxNumber")
+        form.phone.data = customer.get("PhoneNumber")
+        form.address.data = customer.get("Address")
+        form.receivable.data = customer.get("Receivable")
+
+        for row in staffData:
+            if row.get("id") == customer.get("ResponsibleStaffId"):
+                staff = row
+                break
+        form.resStaff.data = staff.get("FirstName") + " " + staff.get("LastName")
+
+        return render_template("companyInfo.html",customer = customer, form = form)
 
 
 @app.route("/purchaseReceipt/info/<int:id>", methods=["GET", "POST"])
@@ -396,6 +580,18 @@ def purchaseReceipt():
 def removeStaff(id):
     deleteStaff(conn,id)
     return redirect("/staff")
+
+
+@app.route('/deletePerson/<int:id>', methods=['POST'])
+def removePerson(id):
+    deletePerson(conn,id)
+    return redirect("/person")
+
+
+@app.route('/deleteCompany/<int:id>', methods=['POST'])
+def removeCompany(id):
+    deleteCompany(conn,id)
+    return redirect("/company")
 
 @app.route('/deleteSalesReceipt/<int:id>', methods=['POST'])
 def removeSalesReceipt(id):
