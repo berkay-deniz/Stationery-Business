@@ -106,14 +106,14 @@ def about():
 @app.route("/productType", methods=["GET", "POST"])
 def productType():
     form = ProductTypeForm(request.form)
-
+    productTypeData=readProductType(conn)
     if request.method == "POST" and form.validate():
         typeName = form.typeName.data
 
         insertProductType(conn,typeName)
-        return redirect("/")
+        return redirect("/productType")
     else:
-        return render_template("product type.html", form=form)
+        return render_template("productType.html", form=form,productTypeData=productTypeData)
 
 
 
@@ -518,7 +518,7 @@ def supplierInfo(supplierId):
         form.debt.data = supplier.get("Debt")
         return render_template("supplierInfo.html",id=id, supplier = supplier, form = form)
 
-#product
+
 @app.route("/product/info/<string:productId>", methods=["GET", "POST"])
 def productInfo(productId):
     productData = readProduct(conn)
@@ -548,6 +548,24 @@ def productInfo(productId):
         form.stock.data = product.get("Stock")
         return render_template("productInfo.html",id=id, product = product, form = form)   
 
+@app.route("/productType/info/<string:productTypeId>", methods=["GET", "POST"])
+def productTypeInfo(productTypeId):
+    productTypeData = readProductType(conn)
+    form = ProductTypeForm(request.form)
+    id =int(productTypeId)
+
+    if request.method == "POST" and form.validate():
+        typeName = form.typeName.data
+
+        updateProductType(conn,id,typeName)
+        return redirect('/productType')
+    else:
+        for row in productTypeData:
+            if row.get("id") == id:
+               productType = row
+               break
+        form.typeName.data = productType.get("TypeName")
+        return render_template("productTypeInfo.html",id=id, productType = productType, form = form)
 
 
 @app.route("/purchaseReceipt", methods=["GET", "POST"])
@@ -612,6 +630,11 @@ def removeSupplier(id):
 def removeProduct(id):
     deleteProduct(conn,id)
     return redirect("/product")
+
+@app.route('/deleteProductType/<int:id>', methods=['POST'])
+def removeProductType(id):
+    deleteProductType(conn,id)
+    return redirect("/productType")
 
 
 

@@ -5,7 +5,7 @@ import pyodbc
 # AFY DESKTOP-ISHU912
 conn = pyodbc.connect(
     "Driver={SQL Server};"
-    "Server=LAPTOP-HCAE3FVL\MSSQLSERVER01;"
+    "Server=DESKTOP-ISHU912;"
     "Database=STATIONERY_BUSINESS;"
     "Trusted_Connection=yes;"
 )
@@ -361,47 +361,60 @@ def deleteProduct(conn,id):
     conn.commit()
     print("Deleted")
 
-def deleteProductType(conn, TypeName):
+def deleteProductType(conn, id):
     cursor = conn.cursor()
     cursor.execute(
 
-        'Delete From PRODUCT_TYPE where TypeName = ? ', (TypeName) 
+        'Delete From PRODUCT_TYPE where id = ? ', (id) 
 
-)
+    )
+    conn.commit()
+    print("Deleted")
 
 def deletePurchaseReceipt(conn, id):
     cursor = conn.cursor()
     cursor.execute(
         'Delete From PURCHASE_RECEIPT where id = ? ', (id) 
 )
-
+    conn.commit()
+    print("Deleted")
 
 def deletePerson(conn, id):
     cursor = conn.cursor()
     cursor.execute(
         'Delete From CUSTOMER where id = ? ', (id) 
 )
+    conn.commit()
+    print("Deleted")
 
 def deleteCompany(conn, id):
     cursor = conn.cursor()
     cursor.execute(
         'Delete From CUSTOMER where id = ? ', (id) 
 )
+    conn.commit()
+    print("Deleted")
 
 def deletePurchaseReceiptProduct(conn,ReceiptId,ProductId):
     cursor = conn.cursor()
     cursor.execute(
         'Delete From PURCHASE_RECEIPT_PRODUCT where ReceiptId = ? and ProductId = ? ', (ReceiptId,ProductId) 
 )
+    conn.commit()
+    print("Deleted")
 
 def deleteSalesReceipt(conn, id):
     cursor = conn.cursor()
     cursor.execute(
         'Delete From SALES_RECEIPT where id = ? ', (id) 
 )
+    conn.commit()
+    print("Deleted")
 
 def deleteSalesReceiptProduct(conn,ReceiptId,ProductId):
     cursor = conn.cursor()
     cursor.execute(
         'Delete From SALES_RECEIPT_PRODUCT where ReceiptId = ? and ProductId = ? ', (ReceiptId,ProductId) 
 )
+    conn.commit()
+    print("Deleted")
