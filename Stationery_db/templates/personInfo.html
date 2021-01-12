@@ -1,0 +1,22 @@
+{% extends 'layout.html' %}
+{% block title %}
+    info
+{% endblock title %}
+
+{% block content %}
+{% from "includes/formhelpers.html" import render_field %}
+
+<h3>{{customer.get("FirstName")}} {{customer.get("LastName")}}</h3>
+<br>
+
+<form method="post">
+    {{ render_field(form.firstName, class="form-control col-6") }}
+    {{ render_field(form.lastName, class="form-control col-6") }}
+    {{ render_field(form.phone, class="form-control col-6") }}
+    {{ render_field(form.address, class="form-control col-6") }}
+    {{ render_field(form.receivable, class="form-control col-6") }}
+    {{ render_field(form.resStaff, class="form-control col-6") }}
+    <button type="submit" class="btn btn-primary">Düzenle</button>
+</form>
+
+{% endblock content %}

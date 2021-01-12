@@ -1,0 +1,92 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    Müşteriler
+{% endblock title %}
+
+{% block content %}
+{% from "includes/formhelpers.html" import render_field %}
+<div class="head">
+    <h2>Müşteriler (Kişi)</h2>
+    <br>
+    <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#addPersonModal">
+      Müşteri Ekle
+    </button>
+</div>
+            
+    <table class="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col">No</th>
+            <th scope="col">Ad</th>
+            <th scope="col">Soyad</th>
+            <th scope="col">Telefon Numarası</th>
+            <th scope="col">Sorumlu Çalışan</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+              {% for index in range(personData |length) %}              
+              <tr>       
+                <th scope="row">{{index+1}}</th>
+                <td>{{personData[index].get('FirstName')}}</td>
+                <td>{{personData[index].get('LastName')}}</td>
+                <td>{{personData[index].get('PhoneNumber')}}</td>
+                <td>{{staffNames[personData[index].get('ResponsibleStaffId')]}}</td>
+                <td>
+                <div style="float:left">
+                  <a href="/person/info/{{personData[index].get("id")}}">
+                    <button type="button" class="btn bt-secondary" id="editButton" title="Düzenle">
+                      Düzenle
+                    </button>
+                  </a>
+                </div>
+                <div style="float:left"></div>
+                  <form method="post" action="{{ url_for('removePerson', id=personData[index].get("id")) }}">
+                    <button type="submit" class="btn btn-secondary" title="Sil">Sil</button>
+                  </form>
+                </div>
+                </td>
+              </tr>
+              {% endfor %}
+             
+        </tbody>
+      </table>
+      <br>
+      
+      
+      <!-- Modal -->
+      <div class="modal fade" id="addPersonModal" tabindex="-1" role="dialog" aria-labelledby="addPersonModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Müşteri Ekle</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form method="post">
+                {{ render_field(form.firstName, class="form-control col-6") }}
+                {{ render_field(form.lastName, class="form-control col-6") }}
+                {{ render_field(form.phone, class="form-control col-6") }}
+                {{ render_field(form.address, class="form-control col-6") }}
+                {{ render_field(form.receivable, class="form-control col-6") }}
+                {{ render_field(form.resStaff, class="form-control col-6") }}
+                <button type="submit" class="btn btn-primary">Ekle</button>
+            </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+<!--
+  
+  
+
+-->
+
+{% endblock content %}

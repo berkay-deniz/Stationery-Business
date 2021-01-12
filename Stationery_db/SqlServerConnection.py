@@ -127,6 +127,27 @@ def insertSupplier(conn, name, phone, address, debt):
     print("Inserted")
 
 
+
+def insertPersonCustomer(conn, firstName, lastName, phone, address, receivable, resStaffId):
+    cursor = conn.cursor()
+    cursor.execute(
+        'insert into Customer (CustomerType, FirstName, LastName, PhoneNumber, Address, Receivable, ResponsibleStaffId) values (?,?,?,?,?,?,?)',
+        ("Person",firstName, lastName, phone, address, receivable, resStaffId)
+    )
+    conn.commit()
+    print("Inserted")
+
+
+def insertCompanyCustomer(conn, companyName, taxNumber, phone, address, receivable, resStaffId):
+    cursor = conn.cursor()
+    cursor.execute(
+        'insert into Customer (CustomerType, CompanyName, TaxNumber, PhoneNumber, Address, Receivable, ResponsibleStaffId) values (?,?,?,?,?,?,?)',
+        ("Company", companyName, taxNumber, phone, address, receivable, resStaffId)
+    )
+    conn.commit()
+    print("Inserted")
+
+
 def insertStaff(conn, tckn, fname, lname, phone, address, bdate, wage, rest):
     cursor = conn.cursor()
     cursor.execute(
@@ -212,6 +233,7 @@ def updateSupplier(conn, id, supplierName, phoneNumber, address, debt):
     print("Updated")
 
 
+
 def updateProduct(conn, id,ProductTypeId,Brand,PurchasePrice,SalePrice,Stock):
 
     cursor = conn.cursor()
@@ -237,6 +259,29 @@ def updatePurchaseReceipt(conn, id, ReceiptNumber, SupplierId, Date):
 
     conn.commit()
     print("Updated")    
+
+
+
+def updatePersonCustomer(conn, id, firstName, lastName, phone, address, receivable, resStaffId):
+    cursor = conn.cursor()
+    cursor.execute(
+        'Update CUSTOMER Set FirstName = ?, LastName = ?, PhoneNumber = ?, Address = ?, Receivable = ?, ResponsibleStaffId = ? Where id = ?',
+        (firstName, lastName, phone, address, receivable, resStaffId, id)
+    )
+    conn.commit()
+    print("Updated")
+
+
+def UpdateCompanyCustomer(conn, id, companyName, taxNumber, phone, address, receivable, resStaffId):
+    cursor = conn.cursor()
+    cursor.execute(
+        'Update CUSTOMER Set CompanyName = ?, TaxNumber = ?, PhoneNumber = ?, Address = ?, Receivable = ?, ResponsibleStaffId = ? Where id = ?',
+        (companyName, taxNumber, phone, address, receivable, resStaffId, id)
+    )
+    conn.commit()
+    print("Updated")
+
+
 
 def updatePurchaseReceiptProduct(conn, ReceiptId, ProductId, PurchaseUnitPrice, PurchaseAmount, TotalPrice):
 
@@ -328,6 +373,19 @@ def deletePurchaseReceipt(conn, id):
     cursor = conn.cursor()
     cursor.execute(
         'Delete From PURCHASE_RECEIPT where id = ? ', (id) 
+)
+
+
+def deletePerson(conn, id):
+    cursor = conn.cursor()
+    cursor.execute(
+        'Delete From CUSTOMER where id = ? ', (id) 
+)
+
+def deleteCompany(conn, id):
+    cursor = conn.cursor()
+    cursor.execute(
+        'Delete From CUSTOMER where id = ? ', (id) 
 )
 
 def deletePurchaseReceiptProduct(conn,ReceiptId,ProductId):
