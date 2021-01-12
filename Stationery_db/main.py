@@ -124,6 +124,8 @@ def product():
 @app.route("/salesReceipt", methods=["GET", "POST"])
 def salesReceipt():
     form = salesReceiptForm(request.form)
+    receiptData = readSalesReceipt(conn)
+    customerData = readCustomer(conn)
 
     if request.method == "POST" and form.validate():
         receiptNumber = form.receiptNumber.data
@@ -133,8 +135,8 @@ def salesReceipt():
         companyName = form.companyName.data
         date = form.date.data
 
-        data = readCustomer(conn)
-        for row in data:
+        customerData = readCustomer(conn)
+        for row in customerData:
 
             if row.get("CustomerType") == 'Company' and row.get("CompanyName") == companyName:
                 customerId = row.get("id")
@@ -145,7 +147,13 @@ def salesReceipt():
         insertSalesReceipt(conn, receiptNumber, customerId, date)
         return redirect("/")
     else:
-        return render_template("sales receipt.html", form=form)
+        customersWithId = dict()
+        for customer in customerData:
+            if customer.get("CustomerType") == "Person":
+                customersWithId[customer.get("id")] = "" + customer.get("FirstName") + " " + customer.get("LastName")
+            else:
+                customersWithId[customer.get("id")] = customer.get("CompanyName")
+        return render_template("salesReceipt.html", form=form, receiptData = receiptData,customers = customersWithId )
 
 
 
@@ -222,6 +230,86 @@ def staffInfo(staffId):
         form.rest.data = staff.get("DaysOfRest")
         return render_template("staffInfo.html",id=id, staff = staff, form = form)
 
+
+
+@app.route("/purchaseReceipt/info/<int:id>", methods=["GET", "POST"])
+def purchaseReceiptInfo(id):
+    receiptData = readPurchaseReceipt(conn)
+    form = PurchaseReceiptForm(request.form)
+
+
+    if request.method == "POST" and form.validate():
+        receiptNumber = form.receiptNumber.data
+        date = form.date.data
+        suppliers = readSupplier(conn)
+        for supplier in suppliers:
+            if supplier.get("SupplierName") == form.supplierName.data:
+                supplierId = supplier.get("id")
+                break
+        updatePurchaseReceipt(conn, id, receiptNumber, supplierId, date)
+        return redirect('/purchaseReceipt')
+    else:
+        for row in receiptData:
+            if row.get("id") == id:
+                receipt = row
+                break
+        suppliers = readSupplier(conn)
+        for supplier in suppliers:
+            if supplier.get("id") == receipt.get("SupplierId"):
+                s = supplier
+                break
+        form.supplierName.data = s.get("SupplierName")
+        form.receiptNumber.data = receipt.get("ReceiptNumber")
+        form.date.data = receipt.get("Date")
+        return render_template("purchaseReceiptInfo.html",form = form, receipt = receipt)
+
+
+
+@app.route("/salesReceipt/info/<int:id>", methods=["GET", "POST"])
+def salesReceiptInfo(id):
+    receiptData = readSalesReceipt(conn)
+    form = salesReceiptForm(request.form)
+
+    if request.method == "POST" and form.validate():
+        receiptNumber = form.receiptNumber.data
+        customerType = form.customerType.data
+        firstName = form.firstName.data
+        lastName = form.lastName.data
+        companyName = form.companyName.data
+        date = form.date.data
+        customers = readCustomer(conn)
+        for customer in customers:
+            if customerType == "Person" and customer.get("FirstName") == firstName and customer.get("LastName") == lastName:
+                customerId = customer.get("id")
+                break
+            elif customerType == "Company" and customer.get("CompanyName") == companyName:
+                customerId = customer.get("id")
+                break
+        updateSalesReceipt(conn, id, receiptNumber, customerId, date)
+        return redirect('/salesReceipt')
+    else:
+        for row in receiptData:
+            if row.get("id") == id:
+                receipt = row
+                break
+        customers = readCustomer(conn)
+        for customer in customers:
+            if customer.get("id") == receipt.get("CustomerId"):
+                c = customer
+                break
+        form.receiptNumber.data = receipt.get("ReceiptNumber")
+        form.customerType.data = c.get("CustomerType")
+        form.date.data = receipt.get("Date")
+        if c.get("CustomerType") == "Person":
+            form.companyName.data = None
+            form.firstName.data = c.get("FirstName")
+            form.lastName.data = c.get("LastName")
+        else:
+            form.firstName.data = None
+            form.lastName.data = None
+            form.companyName.data = c.get("CompanyName")
+        return render_template("salesReceiptInfo.html",form = form, receipt = receipt)
+
 @app.route("/supplier/info/<string:supplierId>", methods=["GET", "POST"])
 def supplierInfo(supplierId):
     supplierData = readSupplier(conn)
@@ -277,8 +365,10 @@ def productInfo(productId):
         return render_template("productInfo.html",id=id, product = product, form = form)   
 
 
+
 @app.route("/purchaseReceipt", methods=["GET", "POST"])
 def purchaseReceipt():
+    receiptData = readPurchaseReceipt(conn)
     form = PurchaseReceiptForm(request.form)
 
     if request.method == "POST" and form.validate():
@@ -293,15 +383,29 @@ def purchaseReceipt():
                 break
 
         insertPurchaseReceipt(conn, receiptNumber, supplierId, date)
-        return redirect("/")
+        return redirect("/purchaseReceipt")
     else:
-        return render_template("purchaseReceipt.html", form=form)
+        suppliersWithId = dict()
+        supplierData = readSupplier(conn)
+        for s in supplierData:
+            suppliersWithId[s.get("id")] = s.get("SupplierName")
+        return render_template("purchaseReceipt.html", form=form, receiptData = receiptData, suppliers = suppliersWithId)
 
 
 @app.route('/deleteStaff/<int:id>', methods=['POST'])
 def removeStaff(id):
     deleteStaff(conn,id)
     return redirect("/staff")
+
+@app.route('/deleteSalesReceipt/<int:id>', methods=['POST'])
+def removeSalesReceipt(id):
+    deleteSalesReceipt(conn,id)
+    return redirect("/salesReceipt")
+
+@app.route('/deletePurchaseReceipt/<int:id>', methods=['POST'])
+def removePurchaseReceipt(id):
+    deletePurchaseReceipt(conn, id)
+    return redirect("/purchaseReceipt")
 
 @app.route('/deleteSupplier/<int:id>', methods=['POST'])
 def removeSupplier(id):

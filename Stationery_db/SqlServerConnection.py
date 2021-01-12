@@ -5,10 +5,31 @@ import pyodbc
 # AFY DESKTOP-ISHU912
 conn = pyodbc.connect(
     "Driver={SQL Server};"
-    "Server=DESKTOP-CPMCPBA;"
+    "Server=LAPTOP-HCAE3FVL\MSSQLSERVER01;"
     "Database=STATIONERY_BUSINESS;"
     "Trusted_Connection=yes;"
 )
+
+def readSalesReceipt(conn):
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM SALES_RECEIPT')
+    columns = [column[0] for column in cursor.description]
+    data = []
+    for row in cursor.fetchall():
+        data.append(dict(zip(columns, row)))
+
+    return data
+
+
+def readPurchaseReceipt(conn):
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM PURCHASE_RECEIPT')
+    columns = [column[0] for column in cursor.description]
+    data = []
+    for row in cursor.fetchall():
+        data.append(dict(zip(columns, row)))
+
+    return data
 
 
 def readProductType(conn):

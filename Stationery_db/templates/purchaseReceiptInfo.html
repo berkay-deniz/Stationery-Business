@@ -1,0 +1,17 @@
+{% extends 'layout.html' %}
+{% block title %}
+    info
+{% endblock title %}
+
+{% block content %}
+{% from "includes/formhelpers.html" import render_field %}
+
+<h3>Fatura No {{receipt.get("ReceiptNumber")}}</h3>
+<br>
+<form method="post">
+    {{ render_field(form.receiptNumber, class="form-control col-4") }}
+    {{ render_field(form.supplierName, class="form-control col-4") }}
+    {{ render_field(form.date, class="form-control col-4") }}
+    <button type="submit" class="btn btn-primary">Düzenle</button>
+</form>
+{% endblock content %}

@@ -1,17 +1,18 @@
 {% extends 'layout.html' %}
 
 {% block title %}
-    Tedarik Faturası
+    Satış Faturası
 {% endblock title %}
 
 {% block content %}
 {% from "includes/formhelpers.html" import render_field %}
+ 
 
 <div class="head">
-    <h2>Alış Faturaları</h2>
+    <h2>Satış Faturaları</h2>
     <br>
-    <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#addPurchaseReceiptModal">
-      Alış Faturası Ekle
+    <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#addSalesReceiptModal">
+      Satış Faturası Ekle
     </button>
 </div>
             
@@ -20,7 +21,7 @@
           <tr>
             <th scope="col">No</th>
             <th scope="col">Fatura Numarası</th>
-            <th scope="col">Tedarikçi Adı</th>
+            <th scope="col">Müşteri Adı</th>
             <th scope="col">Tarih</th>
           </tr>
         </thead>
@@ -30,18 +31,18 @@
               <tr>       
                 <th scope="row">{{index+1}}</th>
                 <td>{{receiptData[index].get('ReceiptNumber')}}</td>
-                <td>{{suppliers[receiptData[index].get('SupplierId')]}}</td>
+                <td>{{customers[receiptData[index].get('CustomerId')]}}</td>
                 <td>{{receiptData[index].get('Date')}}</td>
                 <td>
                 <div style="float:left">
-                  <a href="/purchaseReceipt/info/{{receiptData[index].get("id")}}">
+                  <a href="/salesReceipt/info/{{receiptData[index].get("id")}}">
                     <button type="button" class="btn bt-secondary" id="editButton" title="Düzenle">
                       Düzenle
                     </button>
                   </a>
                 </div>
                 <div style="float:left"></div>
-                  <form method="post" action="{{ url_for('removePurchaseReceipt', id=receiptData[index].get("id")) }}">
+                  <form method="post" action="{{ url_for('removeSalesReceipt', id=receiptData[index].get("id")) }}">
                     <button type="submit" class="btn btn-secondary" title="Sil">Sil</button>
                   </form>
                 </div>
@@ -55,20 +56,25 @@
       
       
       <!-- Modal -->
-      <div class="modal fade" id="addPurchaseReceiptModal" tabindex="-1" role="dialog" aria-labelledby="addPurchaseReceiptModal" aria-hidden="true">
+      <div class="modal fade" id="addSalesReceiptModal" tabindex="-1" role="dialog" aria-labelledby="addSalesReceiptModal" aria-hidden="true">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">Alış Faturası Ekle</h5>
+              <h5 class="modal-title" id="exampleModalLabel">Satış Faturası Ekle</h5>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
             <div class="modal-body">
                 <form method="post">
+
                     {{ render_field(form.receiptNumber, class="form-control col-4") }}
-                    {{ render_field(form.supplierName, class="form-control col-4") }}
+                    {{ render_field(form.customerType, class="form-control col-4") }}
+                    {{ render_field(form.firstName, class="form-control col-4") }}
+                    {{ render_field(form.lastName, class="form-control col-4") }}
+                    {{ render_field(form.companyName, class="form-control col-4") }}
                     {{ render_field(form.date, class="form-control col-4") }}
+            
                     <button type="submit" class="btn btn-primary">Ekle</button>
                 </form>
             </div>
@@ -78,11 +84,6 @@
           </div>
         </div>
       </div>
-
-
-
-
-
 
 
 {% endblock content %}
