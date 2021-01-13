@@ -241,7 +241,7 @@ def company():
                 break
 
         insertCompanyCustomer(conn, companyName, taxNumber, phone, address, receivable, resStaffId )
-        flash("Müşteri şirket başarıyla eklendi!","success")
+        flash("Müşteri kurum başarıyla eklendi!","success")
         return redirect("/company")
 
     else:
@@ -332,7 +332,7 @@ def staff():
         rest = form.rest.data
         insertStaff(conn, tckn, fname, lname, phone,
                     address, bdate, wage, rest)
-        flash("Personel başarıyla eklendi","success")            
+        flash("Çalışan başarıyla eklendi","success")            
         return redirect('/staff')
 
     else:
@@ -355,7 +355,7 @@ def staffInfo(staffId):
         rest = form.rest.data
         updateStaff(conn,id, tckn, fname, lname, phone,
                     address, bdate, wage, rest)
-        flash("Personel bilgileri başarıyla güncellendi!","success")           
+        flash("Çalışan bilgileri başarıyla güncellendi!","success")           
         return redirect('/staff')
     else:
         for row in staffData:
@@ -436,7 +436,7 @@ def companyInfo(id):
                 break
 
         UpdateCompanyCustomer(conn, id, companyName, taxNumber, phone, address, receivable, resStaffId)
-        flash("Müşteri şirketin bilgileri başarıyla güncellendi!","success")    
+        flash("Müşteri kurumun bilgileri başarıyla güncellendi!","success")    
         return redirect('/company')
 
     else:
@@ -677,21 +677,21 @@ def purchaseReceipt():
 @app.route('/deleteStaff/<int:id>', methods=['POST'])
 def removeStaff(id):
     deleteStaff(conn,id)
-    flash("Personel silindi!","success")
+    flash("Çalışan silindi!","success")
     return redirect("/staff")
 
 
 @app.route('/deletePerson/<int:id>', methods=['POST'])
 def removePerson(id):
     deletePerson(conn,id)
-    flash("Kişisel müşteri silindi!","success")
+    flash("Bireysel müşteri silindi!","success")
     return redirect("/person")
 
 
 @app.route('/deleteCompany/<int:id>', methods=['POST'])
 def removeCompany(id):
     deleteCompany(conn,id)
-    flash("Müşteri şirket silindi!","success")
+    flash("Müşteri kurum silindi!","success")
     return redirect("/company")
 
 @app.route('/deleteSalesReceipt/<int:id>', methods=['POST'])
@@ -763,7 +763,6 @@ def addProductToPurchaseReceipt(id):
     
     insertPurchaseReceiptProduct(conn, id, productId, unitPrice, amount)
     flash("Ürün faturaya eklendi!","success")
-
     return redirect(url_for('purchaseReceiptInfo', id=id))
 
 
@@ -788,7 +787,6 @@ def addProductToSalesReceipt(id):
     
     insertSalesReceiptProduct(conn, id, productId, unitPrice, amount)
     flash("Ürün faturaya eklendi!","success")
-
     return redirect(url_for('salesReceiptInfo', id=id))
 
 
