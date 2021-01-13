@@ -113,7 +113,7 @@ def productType():
         typeName = form.typeName.data
 
         insertProductType(conn,typeName)
-        flash("Ürün Çeşidi Eklendi","success")
+        flash("Ürün çeşidi başarıyla eklendi!","success")
         return redirect("/productType")
     else:
         return render_template("productType.html", form=form,productTypeData=productTypeData)
@@ -140,6 +140,7 @@ def product():
 
         insertProduct(conn, productTypeId, brand,
                       purchasePrice, salePrice, stock)
+        flash("Ürün başarıyla eklendi!","success")              
         return redirect("/product")
     else:
         productTypes = dict()
@@ -168,9 +169,9 @@ def person():
                 resStaffId = row.get("id")
                 break
 
-
+                    
         insertPersonCustomer(conn, firstName, lastName, phone, address, receivable, resStaffId )
-
+        flash("Bireysel müşteri başarıyla eklendi!","success")
         return redirect("/person")
 
     else:
@@ -207,7 +208,7 @@ def company():
                 break
 
         insertCompanyCustomer(conn, companyName, taxNumber, phone, address, receivable, resStaffId )
-
+        flash("Müşteri şirket başarıyla eklendi!","success")
         return redirect("/company")
 
     else:
@@ -249,6 +250,7 @@ def salesReceipt():
                 customerId = row.get("id")
                 break
         insertSalesReceipt(conn, receiptNumber, customerId, date)
+        flash("Satış faturası başarıyla eklendi!","success")
         return redirect("/")
     else:
         customersWithId = dict()
@@ -273,6 +275,7 @@ def supplier():
         address = form.address.data
         debt = form.debt.data
         insertSupplier(conn, name, phoneNumber, address, debt)
+        flash("Tedarikçi başarıyla eklendi!","success")
         return redirect("/supplier")
     else:
         return render_template("supplier.html", form=form,supplierData=supplierData)
@@ -296,6 +299,7 @@ def staff():
         rest = form.rest.data
         insertStaff(conn, tckn, fname, lname, phone,
                     address, bdate, wage, rest)
+        flash("Personel başarıyla eklendi","success")            
         return redirect('/staff')
 
     else:
@@ -318,6 +322,7 @@ def staffInfo(staffId):
         rest = form.rest.data
         updateStaff(conn,id, tckn, fname, lname, phone,
                     address, bdate, wage, rest)
+        flash("Personel bilgileri başarıyla güncellendi!","success")           
         return redirect('/staff')
     else:
         for row in staffData:
@@ -355,6 +360,7 @@ def personInfo(id):
                 break
 
         updatePersonCustomer(conn, id, firstName, lastName, phone, address, receivable, resStaffId)
+        flash("Bireysel müşterinin bilgileri başarıyla güncellendi!","success")
         return redirect('/person')
 
     else:
@@ -397,6 +403,7 @@ def companyInfo(id):
                 break
 
         UpdateCompanyCustomer(conn, id, companyName, taxNumber, phone, address, receivable, resStaffId)
+        flash("Müşteri şirketin bilgileri başarıyla güncellendi!","success")    
         return redirect('/company')
 
     else:
@@ -435,6 +442,7 @@ def purchaseReceiptInfo(id):
                 supplierId = supplier.get("id")
                 break
         updatePurchaseReceipt(conn, id, receiptNumber, supplierId, date)
+        flash("Alış faturası başarıyla güncellendi!","success")
         return redirect('/purchaseReceipt')
     else:
         for row in receiptData:
@@ -474,6 +482,7 @@ def salesReceiptInfo(id):
                 customerId = customer.get("id")
                 break
         updateSalesReceipt(conn, id, receiptNumber, customerId, date)
+        flash("Satış faturası başarıyla güncellendi!","success")
         return redirect('/salesReceipt')
     else:
         for row in receiptData:
@@ -510,6 +519,7 @@ def supplierInfo(supplierId):
         address = form.address.data
         debt = form.debt.data
         updateSupplier(conn,id,name,phone,address,debt)
+        flash("Tedarikçi bilgileri başarıyla güncellendi!","success")
         return redirect('/supplier')
     else:
         for row in supplierData:
@@ -540,6 +550,7 @@ def productInfo(productId):
                 productTypeId = row.get("id")
                 break
         updateProduct(conn,id,productTypeId,brand,purchasePrice,salePrice,stock,)
+        flash("Ürün bilgileri başarıyla güncellendi!","success")
         return redirect('/product')
     else:
         for row in productData:
@@ -562,6 +573,7 @@ def productTypeInfo(productTypeId):
         typeName = form.typeName.data
 
         updateProductType(conn,id,typeName)
+        flash("Ürün çeşidi başarıyla güncellendi!","success")
         return redirect('/productType')
     else:
         for row in productTypeData:
@@ -589,6 +601,7 @@ def purchaseReceipt():
                 break
 
         insertPurchaseReceipt(conn, receiptNumber, supplierId, date)
+        flash("Alış faturası başarıyla eklendi!","success")
         return redirect("/purchaseReceipt")
     else:
         suppliersWithId = dict()
@@ -601,43 +614,51 @@ def purchaseReceipt():
 @app.route('/deleteStaff/<int:id>', methods=['POST'])
 def removeStaff(id):
     deleteStaff(conn,id)
+    flash("Personel silindi!","success")
     return redirect("/staff")
 
 
 @app.route('/deletePerson/<int:id>', methods=['POST'])
 def removePerson(id):
     deletePerson(conn,id)
+    flash("Kişisel müşteri silindi!","success")
     return redirect("/person")
 
 
 @app.route('/deleteCompany/<int:id>', methods=['POST'])
 def removeCompany(id):
     deleteCompany(conn,id)
+    flash("Müşteri şirket silindi!","success")
     return redirect("/company")
 
 @app.route('/deleteSalesReceipt/<int:id>', methods=['POST'])
 def removeSalesReceipt(id):
     deleteSalesReceipt(conn,id)
+    flash("Satış faturası silindi!","success")
     return redirect("/salesReceipt")
 
 @app.route('/deletePurchaseReceipt/<int:id>', methods=['POST'])
 def removePurchaseReceipt(id):
     deletePurchaseReceipt(conn, id)
+    flash("Alış faturası silindi!","success")
     return redirect("/purchaseReceipt")
 
 @app.route('/deleteSupplier/<int:id>', methods=['POST'])
 def removeSupplier(id):
     deleteSupplier(conn,id)
+    flash("Tedarikçi silindi!","success")
     return redirect("/supplier")
 
 @app.route('/deleteProduct/<int:id>', methods=['POST'])
 def removeProduct(id):
     deleteProduct(conn,id)
+    flash("Ürün silindi!","success")
     return redirect("/product")
 
 @app.route('/deleteProductType/<int:id>', methods=['POST'])
 def removeProductType(id):
     deleteProductType(conn,id)
+    flash("Ürün çeşidi silindi!","success")
     return redirect("/productType")
 
 
