@@ -4,7 +4,7 @@ from SqlServerConnection import *
 
 class SupplierForm(Form):
     name = StringField('Tedarikçi İsmi', validators=[validators.length(
-        max=50, message='Çok fazla karakter girdiniz!'), validators.DataRequired('Bu alan gerekli')])
+        max=50, message='Çok fazla karakter girdiniz!'), validators.DataRequired('Bu alanı boş bırakamazsınız')])
     phoneNumber = StringField('Telefon Numarası', validators=[validators.length(
         min=10, max=10, message='Geçersiz Telefon Numarası')])
     address = StringField('Adres')
@@ -12,11 +12,11 @@ class SupplierForm(Form):
 
 class StaffForm(Form):
     tckn = StringField("TC Kimlik No", validators=[validators.length(
-        min=11, max=11, message='Geçersiz TC kimlik no'), validators.DataRequired('Bu alan gerekli!')])
+        min=11, max=11, message='Geçersiz TC kimlik no'), validators.DataRequired('Bu alanı boş bırakamazsınız')])
     fname = StringField('Ad', validators=[validators.length(
-        max=25, message='Çok fazla karakter girdiniz!'), validators.DataRequired('Bu alan gerekli')])
+        max=25, message='Çok fazla karakter girdiniz!'), validators.DataRequired('Bu alanı boş bırakamazsınız')])
     lname = StringField('Soyad', validators=[validators.length(
-        max=25, message='Çok fazla karakter girdiniz!'), validators.DataRequired('Bu alan gerekli')])
+        max=25, message='Çok fazla karakter girdiniz!'), validators.DataRequired('Bu alanı boş bırakamazsınız')])
     phoneNumber = StringField('Telefon Numarası', validators=[validators.length(
         min=10, max=10, message='Geçersiz Telefon Numarası')])
     address = StringField('Adres')
@@ -32,23 +32,26 @@ class ProductForm(Form):
         types.append(row.get("TypeName"))
 
     typeName = SelectField("Ürün çeşidi", choices=types)
-    brand = StringField("Marka")
-    purchasePrice = FloatField("Alış fiyatı")
-    salePrice = FloatField("Satış fiyatı")
-    stock = IntegerField("Stok")
+    brand = StringField("Marka", validators = [validators.length(max = 25, message = 'Marka ismi en fazla 25 karakter içermelidir' ),validators.DataRequired('Bu alanı boş bırakamazsınız')])
+    purchasePrice = FloatField("Alış fiyatı", validators = [validators.DataRequired('Bu alanı boş bırakamazsınız')])
+    salePrice = FloatField("Satış fiyatı", validators = [validators.DataRequired('Bu alanı boş bırakamazsınız')])
+    stock = IntegerField("Stok", validators = [validators.DataRequired('Bu alanı boş bırakamazsınız')])
 
 class ProductTypeForm(Form):
-    typeName=StringField("Ürün türü",validators=[validators.DataRequired("Bu alan gerekli")])
+    typeName=StringField("Ürün türü",validators=[validators.length (max = 25, message = 'Ürün türü en fazla 25 karakter içermelidir'),validators.DataRequired("Bu alanı boş bırakamazsınız")])
 
 class salesReceiptForm(Form):
 
     receiptNumber = StringField("Fatura Numarası")
     customerType = SelectField("Müşteri Türü", choices=[
                                ('Company'), ('Person')])
-    firstName = StringField("Ad")
-    lastName = StringField("Soyad")
-    companyName = StringField("Şirket Adı")
-    date = StringField("Tarih")
+    firstName = StringField("Ad", validators=[validators.length(
+        max=25, message='Çok fazla karakter girdiniz!')])
+    lastName = StringField("Soyad", validators=[validators.length(
+        max=25, message='Çok fazla karakter girdiniz!')])
+    companyName = StringField("Şirket Adı", validators=[validators.length(
+        max=50, message='Çok fazla karakter girdiniz!')])
+    date = StringField("Tarih",validators = [validators.DataRequired('Bu alanı boş bırakamazsınız')])
 
 
 class PurchaseReceiptForm(Form):
@@ -58,9 +61,9 @@ class PurchaseReceiptForm(Form):
         suppliers.append(row.get("SupplierName"))
 
     receiptNumber = StringField("Fatura Numarası", validators=[validators.length(
-        min=8, max=8, message="Fatura Numarası 8 haneli olmalıdır")])
+        min=8, max=8, message="Fatura Numarası 8 haneli olmalıdır"), validators.DataRequired('Bu alanı boş bırakamazsınız')])
     supplierName = SelectField("Tedarikçi adı", choices=suppliers)
-    date = StringField("Tarih")
+    date = StringField("Tarih",validators = [validators.DataRequired('Bu alanı boş bırakamazsınız')])
 
 class ProductPurchaseReceiptForm(Form):
     products = []
@@ -73,8 +76,8 @@ class ProductPurchaseReceiptForm(Form):
     for product in productData:
         products.append(productTypes[product.get("ProductTypeId")] + ", " + product.get("Brand"))
     product = SelectField("Ürün", choices=products)
-    unitPrice = FloatField("Birim Fiyat")
-    amount = FloatField("Alım Miktarı")
+    unitPrice = FloatField("Birim Fiyat",validators = [validators.DataRequired('Bu alanı boş bırakamazsınız')])
+    amount = FloatField("Alım Miktarı",validators = [validators.DataRequired('Bu alanı boş bırakamazsınız')])
 
 class ProductSalesReceiptForm(Form):
     products = []
@@ -87,8 +90,8 @@ class ProductSalesReceiptForm(Form):
         products.append(productTypes[product.get("ProductTypeId")] + ", " + product.get("Brand"))
     
     product = SelectField("Ürün", choices=products)
-    unitPrice = FloatField("Birim Fiyat")
-    amount = FloatField("Alım Miktarı")
+    unitPrice = FloatField("Birim Fiyat",validators = [validators.DataRequired('Bu alanı boş bırakamazsınız')])
+    amount = FloatField("Alım Miktarı",validators = [validators.DataRequired('Bu alanı boş bırakamazsınız')])
 
 
 class PersonForm(Form):
@@ -98,9 +101,12 @@ class PersonForm(Form):
     for s in staff:
         name = s.get("FirstName") + " " + s.get("LastName")
         staffNames.append(name)
-    firstName = StringField("Müşteri Adı")
-    lastName = StringField("Müşteri Soyadı")
-    phone = StringField("Telefon Numarası")
+    firstName = StringField("Müşteri Adı", validators=[validators.length(
+        max=25, message='Müşteri Adı en fazla 25 karakter içermelidir!'),validators.DataRequired("Bu alanı boş bırakamazsınız")])
+    lastName = StringField("Müşteri Soyadı", validators=[validators.length(
+        max=25, message='Müşteri Soyadı en fazla 25 karakter içermelidir!'),validators.DataRequired("Bu alanı boş bırakamazsınız")])
+    phone = StringField("Telefon Numarası",validators=[validators.length(
+        min=10, max=10, message='Geçersiz Telefon Numarası')])
     address = StringField("Adres")
     receivable =StringField("Alacak")
     resStaff = SelectField("İlgilenen Çalışan", choices=staffNames)
@@ -113,9 +119,12 @@ class CompanyForm(Form):
     for s in staff:
         name = s.get("FirstName") + " " + s.get("LastName")
         staffNames.append(name)
-    companyName = StringField("Şirket Adı")
-    taxNumber = StringField("Vergi Numarası")
-    phone = StringField("Telefon Numarası")
+    companyName = StringField("Şirket Adı", validators=[validators.length(
+        max=50, message='Şirket Adı en fazla 50 karakter içermelidir!'),validators.DataRequired("Bu alanı boş bırakamazsınız")])
+    taxNumber = StringField("Vergi Numarası",validators=[validators.length(
+        min=8, max=8, message='Geçersiz Vergi Numarası'),validators.DataRequired("Bu alanı boş bırakamazsınız")])
+    phone = StringField("Telefon Numarası",validators=[validators.length(
+        min=10, max=10, message='Geçersiz Telefon Numarası')])
     address = StringField("Adres")
     receivable =StringField("Alacak")
     resStaff = SelectField("İlgilenen Çalışan", choices=staffNames)
@@ -706,7 +715,7 @@ def removeProductType(id):
 
 @app.route('/addProductToPurchaseReceipt/<int:id>', methods=['POST'])
 def addProductToPurchaseReceipt(id):
-    print("dlkf")
+    
     form = ProductPurchaseReceiptForm(request.form)
     unitPrice = form.unitPrice.data
     amount = form.amount.data
@@ -725,6 +734,7 @@ def addProductToPurchaseReceipt(id):
             break
     
     insertPurchaseReceiptProduct(conn, id, productId, unitPrice, amount)
+    flash("Ürün alış faturası eklendi!","success")
 
     return redirect(url_for('purchaseReceiptInfo', id=id))
 
