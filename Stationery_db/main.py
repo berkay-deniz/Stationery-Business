@@ -458,6 +458,7 @@ def companyInfo(id):
 
 @app.route("/purchaseReceipt/info/<int:id>", methods=["GET", "POST"])
 def purchaseReceiptInfo(id):
+    productData = readProduct(conn)
     receiptData = readPurchaseReceipt(conn)
     form = PurchaseReceiptForm(request.form)
     formProduct = ProductPurchaseReceiptForm(request.form)
@@ -508,6 +509,9 @@ def purchaseReceiptInfo(id):
 def salesReceiptInfo(id):
     receiptData = readSalesReceipt(conn)
     form = salesReceiptForm(request.form)
+    formProduct = ProductSalesReceiptForm(request.form)
+    productData = readProduct(conn)
+    srp = readSalesReceiptProduct(conn)
 
     if request.method == "POST" and form.validate():
         receiptNumber = form.receiptNumber.data
@@ -548,7 +552,19 @@ def salesReceiptInfo(id):
             form.firstName.data = None
             form.lastName.data = None
             form.companyName.data = c.get("CompanyName")
-        return render_template("salesReceiptInfo.html",form = form, receipt = receipt)
+
+        products = dict()
+        productParts = []
+        productTypes = dict()
+        ptData = readProductType(conn)
+        for pt in ptData:
+            productTypes[pt.get("id")] = pt.get("TypeName")
+        for product in productData:
+            products[product.get("id")] = productTypes[product.get("ProductTypeId")] + " (" + product.get("Brand") + ")" 
+        for productPart in srp:
+            if productPart.get("ReceiptId") == receipt.get("id"):
+                productParts.append(productPart)
+        return render_template("salesReceiptInfo.html",formProduct = formProduct, form = form, receipt = receipt, products = products, productParts = productParts)
 
 @app.route("/supplier/info/<string:supplierId>", methods=["GET", "POST"])
 def supplierInfo(supplierId):
@@ -706,7 +722,6 @@ def removeProductType(id):
 
 @app.route('/addProductToPurchaseReceipt/<int:id>', methods=['POST'])
 def addProductToPurchaseReceipt(id):
-    print("dlkf")
     form = ProductPurchaseReceiptForm(request.form)
     unitPrice = form.unitPrice.data
     amount = form.amount.data
@@ -727,6 +742,30 @@ def addProductToPurchaseReceipt(id):
     insertPurchaseReceiptProduct(conn, id, productId, unitPrice, amount)
 
     return redirect(url_for('purchaseReceiptInfo', id=id))
+
+
+@app.route('/addProductToSalesReceipt/<int:id>', methods=['POST'])
+def addProductToSalesReceipt(id):
+    form = ProductSalesReceiptForm(request.form)
+    unitPrice = form.unitPrice.data
+    amount = form.amount.data
+    productFullName = form.product.data.split(", ")
+    typeName = productFullName[0]
+    brand = productFullName[1]
+    ptData = readProductType(conn)
+    for pt in ptData:
+        if pt.get("TypeName") == typeName:
+            typeId = pt.get("id")
+            break
+    productData = readProduct(conn)
+    for prod in productData:
+        if prod.get("ProductTypeId") == typeId and prod.get("Brand") == brand:
+            productId = prod.get("id")
+            break
+    
+    insertSalesReceiptProduct(conn, id, productId, unitPrice, amount)
+
+    return redirect(url_for('salesReceiptInfo', id=id))
 
 
 if __name__ == "__main__":

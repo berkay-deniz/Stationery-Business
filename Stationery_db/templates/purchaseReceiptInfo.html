@@ -18,20 +18,31 @@
 <div class="grid-container">
 
     <div class="grid-child">
-        <h3>Fatura No {{receipt.get("ReceiptNumber")}}</h3>
+        <div style="float:left">
+            <h3>Fatura No {{receipt.get("ReceiptNumber")}}</h3>
+            <br>
+            <form method="post">
+                {{ render_field(form.receiptNumber, class="form-control col-10") }}
+                {{ render_field(form.supplierName, class="form-control col-10") }}
+                {{ render_field(form.date, class="form-control col-10") }}
+            <hr>
+            <button type="submit" class="btn btn-primary">Düzenle</button>
+            </form>
+        </div>
+        <div style="float:right">
+            <a href="/purchaseReceipt" style="margin-right: 100px;" class="btn btn-secondary" role="button">Faturalara Dön</a>
+        </div>
         <br>
-        <form method="post">
-            {{ render_field(form.receiptNumber, class="form-control col-4") }}
-            {{ render_field(form.supplierName, class="form-control col-4") }}
-            {{ render_field(form.date, class="form-control col-4") }}
-        <button type="submit" class="btn btn-primary">Düzenle</button>
-        </form>
-
+        
     </div>
 
     <div class="grid-child">
         <h3>Fatura Detayı</h3>
         <br>
+        <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#addProductToPurchaseReceiptModal">
+            Faturaya Farklı Ürün Ekle
+        </button>
+        <br><br>
         <table class="table table-striped">
             <thead>
               <tr>
@@ -56,15 +67,36 @@
                  
             </tbody>
        </table>
-       <div class="container">
-        <form method="post" action="{{ url_for('addProductToPurchaseReceipt', id=receipt.get("id")) }}">
-            {{ render_field(formProduct.product, class="form-control col-4") }}
-            {{ render_field(formProduct.unitPrice, class="form-control col-4") }}
-            {{ render_field(formProduct.amount, class="form-control col-4") }}
-        <button type="submit"  class="btn btn-primary">Faturaya Ekle</button>
-        </form>
-    </div>
+       
     </div>
   
 </div>
+
+
+ <!-- Modal -->
+ <div class="modal fade" id="addProductToPurchaseReceiptModal" tabindex="-1" role="dialog" aria-labelledby="addProductToPurchaseReceiptModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Faturaya Farklı Ürün Ekle</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <div class="container">
+                <form method="post" action="{{ url_for('addProductToPurchaseReceipt', id=receipt.get("id")) }}">
+                    {{ render_field(formProduct.product, class="form-control col-4") }}
+                    {{ render_field(formProduct.unitPrice, class="form-control col-4") }}
+                    {{ render_field(formProduct.amount, class="form-control col-4") }}
+                <button type="submit"  class="btn btn-primary">Faturaya Ekle</button>
+                </form>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock content %}
