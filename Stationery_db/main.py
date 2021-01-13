@@ -62,6 +62,35 @@ class PurchaseReceiptForm(Form):
     supplierName = SelectField("Tedarikçi adı", choices=suppliers)
     date = StringField("Tarih")
 
+class ProductPurchaseReceiptForm(Form):
+    products = []
+    productTypes = []
+    productData = readProduct(conn)
+    productTypes = dict()
+    ptData = readProductType(conn)
+    for pt in ptData:
+        productTypes[pt.get("id")] = pt.get("TypeName")
+    for product in productData:
+        products.append(productTypes[product.get("ProductTypeId")] + ", " + product.get("Brand"))
+    product = SelectField("Ürün", choices=products)
+    unitPrice = FloatField("Birim Fiyat")
+    amount = FloatField("Alım Miktarı")
+
+class ProductSalesReceiptForm(Form):
+    products = []
+    productData = readProduct(conn)
+    productTypes = dict()
+    ptData = readProductType(conn)
+    for pt in ptData:
+        productTypes[pt.get("id")] = pt.get("TypeName")
+    for product in productData:
+        products.append(productTypes[product.get("ProductTypeId")] + ", " + product.get("Brand"))
+    
+    product = SelectField("Ürün", choices=products)
+    unitPrice = FloatField("Birim Fiyat")
+    amount = FloatField("Alım Miktarı")
+
+
 class PersonForm(Form):
     staff = readStaff(conn)
     staffNames = []
@@ -421,8 +450,9 @@ def companyInfo(id):
 def purchaseReceiptInfo(id):
     receiptData = readPurchaseReceipt(conn)
     form = PurchaseReceiptForm(request.form)
-
-
+    formProduct = ProductPurchaseReceiptForm(request.form)
+    prp = readPurchaseReceiptProduct(conn)
+    
     if request.method == "POST" and form.validate():
         receiptNumber = form.receiptNumber.data
         date = form.date.data
@@ -446,7 +476,20 @@ def purchaseReceiptInfo(id):
         form.supplierName.data = s.get("SupplierName")
         form.receiptNumber.data = receipt.get("ReceiptNumber")
         form.date.data = receipt.get("Date")
-        return render_template("purchaseReceiptInfo.html",form = form, receipt = receipt)
+
+        products = dict()
+        productParts = []
+        productTypes = dict()
+        ptData = readProductType(conn)
+        for pt in ptData:
+            productTypes[pt.get("id")] = pt.get("TypeName")
+        for product in productData:
+            products[product.get("id")] = productTypes[product.get("ProductTypeId")] + " (" + product.get("Brand") + ")" 
+        for productPart in prp:
+            if productPart.get("ReceiptId") == receipt.get("id"):
+                productParts.append(productPart)
+            
+        return render_template("purchaseReceiptInfo.html",formProduct = formProduct, form = form, receipt = receipt, products = products, productParts = productParts)
 
 
 
@@ -637,6 +680,29 @@ def removeProductType(id):
     deleteProductType(conn,id)
     return redirect("/productType")
 
+@app.route('/addProductToPurchaseReceipt/<int:id>', methods=['POST'])
+def addProductToPurchaseReceipt(id):
+    print("dlkf")
+    form = ProductPurchaseReceiptForm(request.form)
+    unitPrice = form.unitPrice.data
+    amount = form.amount.data
+    productFullName = form.product.data.split(", ")
+    typeName = productFullName[0]
+    brand = productFullName[1]
+    ptData = readProductType(conn)
+    for pt in ptData:
+        if pt.get("TypeName") == typeName:
+            typeId = pt.get("id")
+            break
+    productData = readProduct(conn)
+    for prod in productData:
+        if prod.get("ProductTypeId") == typeId and prod.get("Brand") == brand:
+            productId = prod.get("id")
+            break
+    
+    insertPurchaseReceiptProduct(conn, id, productId, unitPrice, amount)
+
+    return redirect(url_for('purchaseReceiptInfo', id=id))
 
 
 if __name__ == "__main__":

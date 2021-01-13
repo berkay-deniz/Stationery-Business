@@ -30,7 +30,40 @@
     </div>
 
     <div class="grid-child">
-        
+        <h3>Fatura Detayı</h3>
+        <br>
+        <table class="table table-striped">
+            <thead>
+              <tr>
+                <th scope="col">No</th>
+                <th scope="col">Ürün</th>
+                <th scope="col">Birim Fiyat</th>
+                <th scope="col">Alım Miktarı</th>
+                <th scope="col">Tutar</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+                  {% for index in range(productParts |length) %}              
+                  <tr>       
+                    <th scope="row">{{index+1}}</th>
+                    <td>{{products[productParts[index].get('ProductId')]}}</td>
+                    <td>{{productParts[index].get('PurchaseUnitPrice')}}</td>
+                    <td>{{productParts[index].get('PurchaseAmount')}}</td>
+                    <td>{{productParts[index].get('TotalPrice')}}</td>
+                  </tr>
+                  {% endfor %}
+                 
+            </tbody>
+       </table>
+       <div class="container">
+        <form method="post" action="{{ url_for('addProductToPurchaseReceipt', id=receipt.get("id")) }}">
+            {{ render_field(formProduct.product, class="form-control col-4") }}
+            {{ render_field(formProduct.unitPrice, class="form-control col-4") }}
+            {{ render_field(formProduct.amount, class="form-control col-4") }}
+        <button type="submit"  class="btn btn-primary">Faturaya Ekle</button>
+        </form>
+    </div>
     </div>
   
 </div>

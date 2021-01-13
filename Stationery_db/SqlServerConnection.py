@@ -188,22 +188,22 @@ def insertProduct(conn, productTypeId, brand, purchasePrice, salePrice, stock):
 
 
 
-def insertPurchaseReceiptProduct(conn, ReceiptId, ProductId, PurchaseUnitPrice, PurchaseAmount, TotalPrice):
+def insertPurchaseReceiptProduct(conn, ReceiptId, ProductId, PurchaseUnitPrice, PurchaseAmount):
     cursor = conn.cursor()
     cursor.execute(
-        'insert into PURCHASE_RECEIPT (ReceiptId, ProductId, PurchaseUnitPrice, PurchaseAmount, TotalPrice) values(?, ?, ?, ?, ?)',
-        (ReceiptId, ProductId, PurchaseUnitPrice, PurchaseAmount, TotalPrice)
+        'insert into PURCHASE_RECEIPT_PRODUCT (ReceiptId, ProductId, PurchaseUnitPrice, PurchaseAmount) values(?, ?, ?, ?)',
+        (ReceiptId, ProductId, PurchaseUnitPrice, PurchaseAmount)
     )
     conn.commit()
     print("inserted")
 
 
 
-def insertSalesReceiptProduct(conn, ReceiptId, ProductId, SaleUnitPrice, SaleAmount, TotalPrice):
+def insertSalesReceiptProduct(conn, ReceiptId, ProductId, SaleUnitPrice, SaleAmount):
     cursor = conn.cursor()
     cursor.execute(
-        'insert into PURCHASE_RECEIPT (ReceiptId, ProductId, SaleUnitPrice, SaleAmount, TotalPrice) values(?, ?, ?, ?, ?)',
-        (ReceiptId, ProductId, SaleUnitPrice, SaleAmount, TotalPrice)
+        'insert into SALES_RECEIPT_PRODUCT (ReceiptId, ProductId, SaleUnitPrice, SaleAmount) values(?, ?, ?, ?)',
+        (ReceiptId, ProductId, SaleUnitPrice, SaleAmount)
     )
     conn.commit()
     print("inserted")
