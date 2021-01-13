@@ -94,7 +94,7 @@ class ProductSalesReceiptForm(Form):
 class PersonForm(Form):
     staff = readStaff(conn)
     staffNames = []
-    staffNames.append(None)
+    staffNames.append('Sorumlu çalışan yok')
     for s in staff:
         name = s.get("FirstName") + " " + s.get("LastName")
         staffNames.append(name)
@@ -109,7 +109,7 @@ class PersonForm(Form):
 class CompanyForm(Form):
     staff = readStaff(conn)
     staffNames = []
-    staffNames.append(None)
+    staffNames.append('Sorumlu çalışan yok')
     for s in staff:
         name = s.get("FirstName") + " " + s.get("LastName")
         staffNames.append(name)
@@ -407,7 +407,7 @@ def personInfo(id):
             if row.get("id") == customer.get("ResponsibleStaffId"):
                 staff = row
                 break
-        if form.resStaff.data is not None:    
+        if form.resStaff.data == 'Sorumlu çalışan yok':    
             form.resStaff.data = staff.get("FirstName") + " " + staff.get("LastName")
 
         return render_template("personInfo.html",customer = customer, form = form)
@@ -450,7 +450,7 @@ def companyInfo(id):
             if row.get("id") == customer.get("ResponsibleStaffId"):
                 staff = row
                 break
-        if form.resStaff.data is not None:    
+        if form.resStaff.data == 'Sorumlu çalışan yok':    
             form.resStaff.data = staff.get("FirstName") + " " + staff.get("LastName")
 
         return render_template("companyInfo.html",customer = customer, form = form)
@@ -458,6 +458,7 @@ def companyInfo(id):
 
 @app.route("/purchaseReceipt/info/<int:id>", methods=["GET", "POST"])
 def purchaseReceiptInfo(id):
+    productData = readProduct(conn)
     receiptData = readPurchaseReceipt(conn)
     form = PurchaseReceiptForm(request.form)
     formProduct = ProductPurchaseReceiptForm(request.form)
