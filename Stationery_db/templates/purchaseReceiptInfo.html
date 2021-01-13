@@ -62,6 +62,11 @@
                     <td>{{productParts[index].get('PurchaseUnitPrice')}}</td>
                     <td>{{productParts[index].get('PurchaseAmount')}}</td>
                     <td>{{productParts[index].get('TotalPrice')}}</td>
+                    <td>
+                        <form method="post" action="{{ url_for('removePurchaseReceiptProduct', id =receipt.get("id") ~ " " ~ productParts[index].get("ProductId")) }}">
+                            <button type="submit" class="btn btn-danger" title="Sil">Sil</button>
+                        </form>
+                    </td>
                   </tr>
                   {% endfor %}
                  

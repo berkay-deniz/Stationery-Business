@@ -137,11 +137,6 @@ def index():
     return render_template("index.html")
 
 
-@app.route("/about")
-def about():
-    return render_template("about.html")
-
-
 
 @app.route("/productType", methods=["GET", "POST"])
 def productType():
@@ -729,6 +724,24 @@ def removeProductType(id):
     flash("Ürün çeşidi silindi!","success")
     return redirect("/productType")
 
+@app.route('/deletePurchaseReceiptProduct/<string:id>', methods=['POST'])
+def removePurchaseReceiptProduct(id):
+    ids = id.split()
+    ReceiptId = int(ids[0])
+    ProductId = int(ids[1])
+    deletePurchaseReceiptProduct(conn, ReceiptId, ProductId)
+    flash("Ürün faturadan silindi!","success")
+    return redirect(url_for('purchaseReceiptInfo', id=ReceiptId))
+
+@app.route('/deleteSalesReceiptProduct/<string:id>', methods=['POST'])
+def removeSalesReceiptProduct(id):
+    ids = id.split()
+    ReceiptId = int(ids[0])
+    ProductId = int(ids[1])
+    deleteSalesReceiptProduct(conn, ReceiptId, ProductId)
+    flash("Ürün faturadan silindi!","success")
+    return redirect(url_for('salesReceiptInfo', id=ReceiptId))
+
 @app.route('/addProductToPurchaseReceipt/<int:id>', methods=['POST'])
 def addProductToPurchaseReceipt(id):
     form = ProductPurchaseReceiptForm(request.form)
@@ -749,7 +762,7 @@ def addProductToPurchaseReceipt(id):
             break
     
     insertPurchaseReceiptProduct(conn, id, productId, unitPrice, amount)
-    flash("Ürün alış faturası eklendi!","success")
+    flash("Ürün faturaya eklendi!","success")
 
     return redirect(url_for('purchaseReceiptInfo', id=id))
 
@@ -774,7 +787,7 @@ def addProductToSalesReceipt(id):
             break
     
     insertSalesReceiptProduct(conn, id, productId, unitPrice, amount)
-    flash("Ürün satış faturası eklendi!","success")
+    flash("Ürün faturaya eklendi!","success")
 
     return redirect(url_for('salesReceiptInfo', id=id))
 
