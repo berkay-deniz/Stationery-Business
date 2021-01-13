@@ -90,7 +90,7 @@ class CompanyForm(Form):
     resStaff = SelectField("İlgilenen Çalışan", choices=staffNames)
 
 app = Flask(__name__)
-
+app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
 @app.route("/")
 def index():
@@ -111,6 +111,7 @@ def productType():
         typeName = form.typeName.data
 
         insertProductType(conn,typeName)
+        flash("Ürün Çeşidi Eklendi","success")
         return redirect("/productType")
     else:
         return render_template("productType.html", form=form,productTypeData=productTypeData)

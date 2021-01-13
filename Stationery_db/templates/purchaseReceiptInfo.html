@@ -1,4 +1,11 @@
 {% extends 'layout.html' %}
+{% block style %}
+.grid-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 20px;
+}
+{% endblock style %}
 {% block title %}
     info
 {% endblock title %}
@@ -6,12 +13,25 @@
 {% block content %}
 {% from "includes/formhelpers.html" import render_field %}
 
-<h3>Fatura No {{receipt.get("ReceiptNumber")}}</h3>
-<br>
-<form method="post">
-    {{ render_field(form.receiptNumber, class="form-control col-4") }}
-    {{ render_field(form.supplierName, class="form-control col-4") }}
-    {{ render_field(form.date, class="form-control col-4") }}
-    <button type="submit" class="btn btn-primary">Düzenle</button>
-</form>
+
+
+<div class="grid-container">
+
+    <div class="grid-child">
+        <h3>Fatura No {{receipt.get("ReceiptNumber")}}</h3>
+        <br>
+        <form method="post">
+            {{ render_field(form.receiptNumber, class="form-control col-4") }}
+            {{ render_field(form.supplierName, class="form-control col-4") }}
+            {{ render_field(form.date, class="form-control col-4") }}
+        <button type="submit" class="btn btn-primary">Düzenle</button>
+        </form>
+
+    </div>
+
+    <div class="grid-child">
+        
+    </div>
+  
+</div>
 {% endblock content %}

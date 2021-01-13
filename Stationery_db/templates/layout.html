@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <style>
+        {% block style %}
+            
+        {% endblock style %}
+    </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
@@ -14,6 +19,7 @@
     {% include 'includes/navbar.html' %}
     <br><br><br>
     <div class="container">
+        {% include 'includes/messages.html' %}
         <div>
             {% block content %}
         
