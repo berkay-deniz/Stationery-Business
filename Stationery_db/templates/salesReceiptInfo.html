@@ -1,20 +1,106 @@
-{% extends 'layout.html' %}
-{% block title %}
-    info
-{% endblock title %}
 
-{% block content %}
-{% from "includes/formhelpers.html" import render_field %}
-
-<h3>Fatura No {{receipt.get("ReceiptNumber")}}</h3>
-<br>
-<form method="post">
-    {{ render_field(form.receiptNumber, class="form-control col-4") }}
-    {{ render_field(form.customerType, class="form-control col-4") }}
-    {{ render_field(form.firstName, class="form-control col-4") }}
-    {{ render_field(form.lastName, class="form-control col-4") }}
-    {{ render_field(form.companyName, class="form-control col-4") }}
-    {{ render_field(form.date, class="form-control col-4") }}
-<button type="submit" class="btn btn-primary">Düzenle</button>
-</form>
-{% endblock content %}
+    {% extends 'layout.html' %}
+    {% block style %}
+    .grid-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-gap: 20px;
+    }
+    {% endblock style %}
+    {% block title %}
+        info
+    {% endblock title %}
+    
+    {% block content %}
+    {% from "includes/formhelpers.html" import render_field %}
+    
+    
+    
+    <div class="grid-container">
+    
+        <div class="grid-child">
+            <div style="float:left">
+                <h3>Fatura No {{receipt.get("ReceiptNumber")}}</h3>
+                <br>
+                <form method="post">
+                    {{ render_field(form.receiptNumber, class="form-control col-10") }}
+                    {{ render_field(form.customerType, class="form-control col-10") }}
+                    {{ render_field(form.firstName, class="form-control col-10") }}
+                    {{ render_field(form.lastName, class="form-control col-10") }}
+                    {{ render_field(form.companyName, class="form-control col-10") }}
+                    {{ render_field(form.date, class="form-control col-10") }}
+                <hr>
+                <button type="submit" class="btn btn-primary">Düzenle</button>
+                </form>
+            </div>
+            <div style="float:right">
+                <a href="/salesReceipt" style="margin-right: 100px;" class="btn btn-secondary" role="button">Faturalara Dön</a>
+            </div>
+            <br>
+ 
+        </div>
+    
+        <div class="grid-child">
+            <h3>Fatura Detayı</h3>
+            <br>
+            <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#addProductToSalesReceiptModal">
+                Faturaya Farklı Ürün Ekle
+            </button>
+            <br><br>
+            <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th scope="col">No</th>
+                    <th scope="col">Ürün</th>
+                    <th scope="col">Birim Fiyat</th>
+                    <th scope="col">Alım Miktarı</th>
+                    <th scope="col">Tutar</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                      {% for index in range(productParts |length) %}              
+                      <tr>       
+                        <th scope="row">{{index+1}}</th>
+                        <td>{{products[productParts[index].get('ProductId')]}}</td>
+                        <td>{{productParts[index].get('SaleUnitPrice')}}</td>
+                        <td>{{productParts[index].get('SaleAmount')}}</td>
+                        <td>{{productParts[index].get('TotalPrice')}}</td>
+                      </tr>
+                      {% endfor %}
+                     
+                </tbody>
+           </table>
+           
+        </div>
+      
+    </div>
+    
+    
+     <!-- Modal -->
+     <div class="modal fade" id="addProductToSalesReceiptModal" tabindex="-1" role="dialog" aria-labelledby="addProductToSalesReceiptModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Faturaya Farklı Ürün Ekle</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <form method="post" action="{{ url_for('addProductToSalesReceipt', id=receipt.get("id")) }}">
+                        {{ render_field(formProduct.product, class="form-control col-4") }}
+                        {{ render_field(formProduct.unitPrice, class="form-control col-4") }}
+                        {{ render_field(formProduct.amount, class="form-control col-4") }}
+                    <button type="submit"  class="btn btn-primary">Faturaya Ekle</button>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endblock content %}

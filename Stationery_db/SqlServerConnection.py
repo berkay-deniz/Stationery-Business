@@ -5,7 +5,7 @@ import pyodbc
 # AFY DESKTOP-ISHU912
 conn = pyodbc.connect(
     "Driver={SQL Server};"
-    "Server=DESKTOP-CPMCPBA;"
+    "Server=LAPTOP-HCAE3FVL\MSSQLSERVER01;"
     "Database=STATIONERY_BUSINESS;"
     "Trusted_Connection=yes;"
 )
