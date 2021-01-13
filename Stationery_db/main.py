@@ -65,6 +65,7 @@ class PurchaseReceiptForm(Form):
 class PersonForm(Form):
     staff = readStaff(conn)
     staffNames = []
+    staffNames.append(None)
     for s in staff:
         name = s.get("FirstName") + " " + s.get("LastName")
         staffNames.append(name)
@@ -79,6 +80,7 @@ class PersonForm(Form):
 class CompanyForm(Form):
     staff = readStaff(conn)
     staffNames = []
+    staffNames.append(None)
     for s in staff:
         name = s.get("FirstName") + " " + s.get("LastName")
         staffNames.append(name)
@@ -160,7 +162,7 @@ def person():
         phone = form.phone.data
         receivable = form.receivable.data
         address = form.address.data
-
+        resStaffId=None
         for row in staffData:
             if row.get("FirstName") + " " + row.get("LastName") == form.resStaff.data:
                 resStaffId = row.get("id")
@@ -198,12 +200,11 @@ def company():
         phone = form.phone.data
         receivable = form.receivable.data
         address = form.address.data
-
+        resStaffId=None
         for row in staffData:
             if row.get("FirstName") + " " + row.get("LastName") == form.resStaff.data:
                 resStaffId = row.get("id")
                 break
-
 
         insertCompanyCustomer(conn, companyName, taxNumber, phone, address, receivable, resStaffId )
 
@@ -347,7 +348,7 @@ def personInfo(id):
         phone = form.phone.data
         receivable = form.receivable.data
         address = form.address.data
-
+        resStaffId=None
         for row in staffData:
             if row.get("FirstName") + " " + row.get("LastName") == form.resStaff.data:
                 resStaffId = row.get("id")
@@ -366,12 +367,13 @@ def personInfo(id):
         form.phone.data = customer.get("PhoneNumber")
         form.address.data = customer.get("Address")
         form.receivable.data = customer.get("Receivable")
-
+        form.resStaff.data=None
         for row in staffData:
             if row.get("id") == customer.get("ResponsibleStaffId"):
                 staff = row
                 break
-        form.resStaff.data = staff.get("FirstName") + " " + staff.get("LastName")
+        if form.resStaff.data is not None:    
+            form.resStaff.data = staff.get("FirstName") + " " + staff.get("LastName")
 
         return render_template("personInfo.html",customer = customer, form = form)
 
@@ -388,7 +390,7 @@ def companyInfo(id):
         phone = form.phone.data
         receivable = form.receivable.data
         address = form.address.data
-
+        resStaffId=None
         for row in staffData:
             if row.get("FirstName") + " " + row.get("LastName") == form.resStaff.data:
                 resStaffId = row.get("id")
@@ -407,12 +409,13 @@ def companyInfo(id):
         form.phone.data = customer.get("PhoneNumber")
         form.address.data = customer.get("Address")
         form.receivable.data = customer.get("Receivable")
-
+        form.resStaff.data = None
         for row in staffData:
             if row.get("id") == customer.get("ResponsibleStaffId"):
                 staff = row
                 break
-        form.resStaff.data = staff.get("FirstName") + " " + staff.get("LastName")
+        if form.resStaff.data is not None:    
+            form.resStaff.data = staff.get("FirstName") + " " + staff.get("LastName")
 
         return render_template("companyInfo.html",customer = customer, form = form)
 
